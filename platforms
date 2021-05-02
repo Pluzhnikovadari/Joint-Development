@@ -1,0 +1,148 @@
+from tkinter import *
+import time
+import random
+
+class Rect:
+    def __init__(self, start_x, start_y, canvas, color):
+        self.canvas = canvas
+        self.id = canvas.create_rectangle(0, 0, 100, 15, fill=color)
+        self.starting_point_x = start_x
+        self.starting_point_y = start_y
+        self.canvas.move(self.id, self.starting_point_x, self.starting_point_y)
+        self.canvas_width = self.canvas.winfo_width()
+
+
+
+class Ball:
+    def __init__(self, canvas, paddle, rect, color):
+        self.canvas = canvas
+        self.paddle = paddle
+        self.rect = rect
+        self.id = canvas.create_oval(10,10, 25, 25, fill=color)
+        self.canvas.move(self.id, 245, 100)
+        starts = [-2, -1, 1, 2]
+        random.shuffle(starts)
+        self.x = starts[0]
+        self.y = -2
+        self.canvas_height = self.canvas.winfo_height()
+        self.canvas_width = self.canvas.winfo_width()
+        self.hit_bottom = False
+        self.start_bottom = False
+        self.fir = [True for i in range(len(rect))]
+
+
+    # обрабатываем касание платформы
+    def hit_paddle(self, pos):
+        paddle_pos = self.canvas.coords(self.paddle.id)
+        if pos[2] >= paddle_pos[0] and pos[0] <= paddle_pos[2] and pos[3] >= paddle_pos[1] and pos[3] <= paddle_pos[3]:
+            return True
+        return False
+
+    def hit_rect(self, ind, pos):
+        if self.fir[ind]:
+            rect_pos = self.canvas.coords(self.rect[ind].id)
+            if pos[1] <= rect_pos[3] and pos[3] >= rect_pos[1] and pos[0] >= rect_pos[0] and pos[2] <= rect_pos[2]:
+                self.fir[ind] = False
+                return True
+            return False
+
+
+    # метод, который отвечает за движение шарика
+    def draw(self):
+        self.canvas.move(self.id, self.x, self.y)
+        pos = self.canvas.coords(self.id)
+        if pos[1] <= 0:
+            self.y = 2
+        if pos[3] >= self.canvas_height:
+            self.hit_bottom = True
+            canvas.create_text(250, 120, text='Вы проиграли', font=('Courier', 30), fill='red')
+        if True not in self.fir:
+            self.hit_bottom = True
+            canvas.create_text(250, 120, text='Вы победили!', font=('Courier', 30), fill='red')
+        if self.hit_paddle(pos) == True:
+            self.y = -2
+        for i in range(len(self.rect)):
+            if self.hit_rect(i, pos) == True:
+                self.y = 2
+
+        if pos[0] <= 0:
+            self.x = 2
+        if pos[2] >= self.canvas_width:
+            self.x = -2
+
+
+#  Описываем класс, который отвечает за платформы
+class Paddle:
+    def __init__(self, canvas, color):
+        self.canvas = canvas
+        self.id = canvas.create_rectangle(0, 0, 100, 10, fill=color)
+        start_1 = [40, 60, 90, 120, 150, 180, 200]
+        random.shuffle(start_1)
+        self.starting_point_x = start_1[0]
+        self.canvas.move(self.id, self.starting_point_x, 300)
+        self.x = 0
+        self.canvas_width = self.canvas.winfo_width()
+        # задаём обработчик нажатий
+        
+        self.canvas.bind_all('<KeyPress-Right>', self.turn_right)
+        self.canvas.bind_all('<KeyPress-Left>', self.turn_left)
+        self.started = 2
+   
+        self.canvas.bind_all('<KeyPress-Return>', self.start_game)
+        self.dr = canvas.create_text(250, 120, text='  Нажмите Enter, \nчтобы начать игру', font=('Courier', 30), fill='red')
+
+
+    def turn_right(self, event):
+        self.x = 15
+        pos = self.canvas.coords(self.id)
+        if pos[2] >= self.canvas_width:
+            self.x = 0
+        self.canvas.move(self.id, self.x, 0)
+        self.x = 0
+    
+
+    def turn_left(self, event):
+        self.x = -15
+        pos = self.canvas.coords(self.id)
+        if pos[0] <= 0:
+            self.x = 0
+        self.canvas.move(self.id, self.x, 0)
+        self.x = 0
+    
+
+    # игра начинается
+    def start_game(self, event):
+        canvas.delete(self.dr)
+        self.started = 1
+
+    
+
+    # метод, который отвечает за движение платформы
+    def draw(self):
+        pos = self.canvas.coords(self.id)
+
+
+tk = Tk()
+tk.title('Game')
+tk.resizable(0, 0)
+tk.wm_attributes('-topmost', 1)
+canvas = Canvas(tk, width=500, height=400, highlightthickness=0)
+canvas.pack()
+tk.update()
+
+paddle = Paddle(canvas, 'White')
+rect = [Rect(0, 0, canvas, 'green'), Rect(100, 0, canvas, 'yellow'), Rect(200, 0, canvas, 'green'), Rect(300, 0, canvas, 'blue'), 
+    Rect(400, 0, canvas, 'white'), Rect(0, 15, canvas, 'blue'), Rect(200, 15, canvas, 'white'), Rect(400, 15, canvas, 'red')]
+ball = Ball(canvas, paddle, rect, 'red')    
+while not ball.hit_bottom:
+    if paddle.started == 1:
+        ball.draw()
+        paddle.draw()
+        for i in range(len(ball.rect)):
+            if not ball.fir[i]:
+                canvas.delete(rect[i].id)
+
+    tk.update_idletasks()
+    tk.update()
+    time.sleep(0.01)
+time.sleep(3)
