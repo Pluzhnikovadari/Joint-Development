@@ -12,9 +12,12 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 END_TEXT_COLOR = (200, 20, 20)
+WALL_COLOR = (200, 200, 30)
 FPS = 60
 PLAYER_START = (WIN_WIDTH // 2, WIN_HEIGHT // 2)
 PLAYER_SPEED = 3
+GENERATOR_FREQ = 3
+BALL_RADIUS = 20
 
 
 def intercect_line_circle(x0, y0, r, x1, y1, x2, y2):
@@ -223,19 +226,17 @@ class Player:
 
 def init_walls(surface):
     wall_list = []
-    wall_list.append(Wall(surface, (0, 0), (WALL_WIDTH, WIN_HEIGHT), RED))
-    wall_list.append(Wall(surface, (0, 0), (WIN_WIDTH, WALL_WIDTH), RED))
+    wall_list.append(Wall(surface, (0, 0), (WALL_WIDTH, WIN_HEIGHT), WALL_COLOR))
+    wall_list.append(Wall(surface, (0, 0), (WIN_WIDTH, WALL_WIDTH), WALL_COLOR))
     wall_list.append(Wall(surface, (WIN_WIDTH - WALL_WIDTH, 0),
-                          (WALL_WIDTH, WIN_HEIGHT), RED))
+                          (WALL_WIDTH, WIN_HEIGHT), WALL_COLOR))
     wall_list.append(Wall(surface, (WALL_WIDTH, WIN_HEIGHT - WALL_WIDTH),
-                          (WIN_WIDTH, WALL_WIDTH), RED))
+                          (WIN_WIDTH, WALL_WIDTH), WALL_COLOR))
 
-    wall_list.append(Wall(surface, (WIN_WIDTH * 0.6, WIN_HEIGHT * 0.6),
-                          (WALL_WIDTH, WALL_WIDTH), RED))
     wall_list.append(Wall(surface, (300, 200),
-                          (70, 650), RED))
+                          (70, 650), WALL_COLOR))
     wall_list.append(Wall(surface, (300, 200),
-                          (900, 70), RED))
+                          (900, 70), WALL_COLOR))
     return wall_list
 
 def description():
@@ -244,7 +245,7 @@ def description():
           "Чтобы остановить игру, нажмите Пробел")
 
 def end_of_game(surface, time):
-    sc.fill(GREEN)
+    sc.fill(BLACK)
     
     f = pygame.font.SysFont('arial', 48)
     text = f.render("Вы проиграли! Продержавшись {:.2f} секунд".format(time), False,
@@ -270,7 +271,7 @@ def game_restart(surface, wall_list):
 pygame.font.init()
 description()
 sc = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-sc.fill(BLACK)
+sc.fill(GREEN)
 pygame.display.update()
 motion = True
 clock = pygame.time.Clock()
@@ -278,7 +279,7 @@ player = Player(sc, PLAYER_START, PLAYER_SPEED)
 wall_list = init_walls(sc)
 obj_list = wall_list + [player]
 sc.blit(player.surf, player.rect)
-start_time = time.time()
+last_gen = start_time = time.time()
 
 pygame.display.update()
 game_end = False
@@ -294,17 +295,21 @@ while True:
         continue
     for i in pygame.event.get():
         if i.type == pygame.QUIT:
-            sys.exit() 
-        if i.type == pygame.MOUSEBUTTONDOWN and i.button == 1:
-            pos = pygame.mouse.get_pos()
-            color = (randint(0, 255), randint(0, 255), randint(0, 255))
-            radius = random() * 10 + 20
-            flag = True
+            sys.exit()
+        if i.type == pygame.KEYDOWN and i.key == pygame.K_SPACE:
+            motion = False if motion else True
+    cur_time = time.time()
+    if cur_time - last_gen > GENERATOR_FREQ:
+        pos = (randint(0, WIN_WIDTH), randint(0, WIN_HEIGHT))
+        color = (randint(0, 255), randint(0, 255), randint(0, 255))
+        radius = BALL_RADIUS
+        while True:
+            unable_create = False
             for obj in obj_list:
                 if obj.type == "ball" and \
                    (pos[0] - obj.pos[0]) ** 2 + \
                    (pos[1] - obj.pos[1])**2 <= (radius + obj.radius) ** 2:
-                    flag = False
+                    unable_create = True
                     break
                 if obj.type == "wall":
                     dif = (pos[0] - obj.start[0], pos[1] - obj.start[1])
@@ -325,16 +330,16 @@ while True:
                                              obj.start[1] + obj.params[1],
                                              obj.start[0] + obj.params[0],
                                              obj.start[1] + obj.params[1]):
-                        flag = False
+                        unable_create = True
                         break
-            if flag:
+            if not unable_create:
                 new_elem = Ball(sc, pos, color, radius)
                 obj_list.append(new_elem)
-        if i.type == pygame.KEYDOWN and i.key == pygame.K_SPACE:
-            motion = False if motion else True
-
+                break
+            pos = (randint(0, WIN_WIDTH), randint(0, WIN_HEIGHT))
+        last_gen = time.time()
     if motion:
-        sc.fill((0, 0, 0))
+        sc.fill(GREEN)
         tmp = obj_list
         if obj_list:
             player.move(tmp)
