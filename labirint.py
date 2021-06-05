@@ -16,7 +16,7 @@ WALL_COLOR = (200, 200, 30)
 FPS = 60
 PLAYER_START = (WIN_WIDTH // 2, WIN_HEIGHT // 2)
 PLAYER_SPEED = 3
-GENERATOR_FREQ = 3
+GENERATOR_FREQ = 1
 BALL_RADIUS = 20
 
 
@@ -184,11 +184,6 @@ class Player:
         elif keys[pygame.K_DOWN]:
             delta_y += self.speed
             self.degree = 180
-        else:
-            rot = pygame.transform.rotate(self.surf, self.degree)
-            rot_rect = rot.get_rect(center=(self.x, self.y))
-            self.sc.blit(rot, rot_rect)
-            return
         move = True
         rot = pygame.transform.rotate(self.surf, self.degree)
         rot_rect = rot.get_rect(center=(self.x + delta_x, self.y + delta_y))
@@ -207,8 +202,7 @@ class Player:
                    point_in_circle(dot2, obj.pos, obj.radius) or \
                    point_in_circle(dot3, obj.pos, obj.radius) or \
                    point_in_circle(dot4, obj.pos, obj.radius):
-                    move = False
-                    break
+                    return False
             if obj.type == "wall":
                 if point_in_rect(dot1, obj.start, obj.params) or \
                    point_in_rect(dot2, obj.start, obj.params) or \
@@ -223,6 +217,7 @@ class Player:
             rot = pygame.transform.rotate(self.surf, self.degree)
             rot_rect = rot.get_rect(center=(self.x, self.y))
         self.sc.blit(rot, rot_rect)
+        return True
 
 def init_walls(surface):
     wall_list = []
@@ -332,6 +327,21 @@ while True:
                                              obj.start[1] + obj.params[1]):
                         unable_create = True
                         break
+                if obj.type == "player":
+                    dot1 = (obj.x - obj.surf.get_width() // 2,
+                            obj.y - obj.surf.get_height() // 2)
+                    dot2 = (obj.x - obj.surf.get_width() // 2,
+                            obj.y + obj.surf.get_height() // 2)
+                    dot3 = (obj.x + obj.surf.get_width() // 2,
+                            obj.y - obj.surf.get_height() // 2)
+                    dot4 = (obj.x + obj.surf.get_width() // 2,
+                            obj.y + obj.surf.get_height() // 2)
+                    if point_in_circle(dot1, pos, radius) or \
+                       point_in_circle(dot2, pos, radius) or \
+                       point_in_circle(dot3, pos, radius) or \
+                       point_in_circle(dot4, pos, radius):
+                        unable_create = True
+                        break
             if not unable_create:
                 new_elem = Ball(sc, pos, color, radius)
                 obj_list.append(new_elem)
@@ -342,16 +352,20 @@ while True:
         sc.fill(GREEN)
         tmp = obj_list
         if obj_list:
-            player.move(tmp)
-            for elem in obj_list:
-                if elem.type == "ball":
-                    tmp = elem.move(tmp)
-                    if not tmp:
-                        game_end = True
-                        start_time = time.time() - start_time
-                        break
-                if elem.type == "wall":
-                    elem.draw()
-            obj_list = tmp
+            if player.move(tmp):
+                for elem in obj_list:
+                    if elem.type == "ball":
+                        tmp = elem.move(tmp)
+                        if not tmp:
+                            game_end = True
+                            start_time = time.time() - start_time
+                            break
+                    if elem.type == "wall":
+                        elem.draw()
+                obj_list = tmp
+            else:
+                game_end = True
+                start_time = time.time() - start_time
+
 
     pygame.display.update()
