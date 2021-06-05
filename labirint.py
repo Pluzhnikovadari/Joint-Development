@@ -15,7 +15,7 @@ END_TEXT_COLOR = (200, 20, 20)
 WALL_COLOR = (200, 200, 30)
 FPS = 60
 PLAYER_START = (WIN_WIDTH // 2, WIN_HEIGHT // 2)
-PLAYER_SPEED = 3
+PLAYER_SPEED = 5
 GENERATOR_FREQ = 1
 BALL_RADIUS = 20
 
@@ -161,7 +161,7 @@ class Player:
         self.degree = 0
         self.type = "player"
         self.surf = pygame.transform.scale(self.surf,
-                    (self.surf.get_width() // 8, self.surf.get_height() // 8))
+                    (self.surf.get_width() // 12, self.surf.get_height() // 12))
 
         self.x, self.y = pos
         self.speed = speed
@@ -229,18 +229,56 @@ def init_walls(surface):
                           (WIN_WIDTH, WALL_WIDTH), WALL_COLOR))
 
     wall_list.append(Wall(surface, (300, 200),
-                          (70, 650), WALL_COLOR))
+                          (50, 650), WALL_COLOR))
     wall_list.append(Wall(surface, (300, 200),
-                          (900, 70), WALL_COLOR))
+                          (900, 50), WALL_COLOR))
+    wall_list.append(Wall(surface, (1150, 400),
+                          (50, 500), WALL_COLOR))
+    wall_list.append(Wall(surface, (1300, 400),
+                          (100, 50), WALL_COLOR))
+    wall_list.append(Wall(surface, (450, 850),
+                          (400, 50), WALL_COLOR))
+    wall_list.append(Wall(surface, (600, 450),
+                          (50, 200), WALL_COLOR))
+    wall_list.append(Wall(surface, (600, 650),
+                          (200, 50), WALL_COLOR))
     return wall_list
 
-def description():
-    print("Нажмите левой кнопкой мыши на экран, чтобы сгенирировать\n" + \
-          "шар, который будет двигаться в случайном направлении.\n" + \
-          "Чтобы остановить игру, нажмите Пробел")
+def game_start(surface):
+    surface.fill(GREEN)
+    
+    f = pygame.font.SysFont('arial', 48)
+    text = f.render("Добро пожаловать в нашу увлекательную игру!", False,
+                      END_TEXT_COLOR)
+    text2 = f.render("Ваша задача: уклоняясь от шаров продержаться", False,
+                      END_TEXT_COLOR)
+    text3 = f.render("на поле как можно дольше", False,
+                      END_TEXT_COLOR)
+    text4 = f.render("Управление:", False,
+                      END_TEXT_COLOR)
+    text5 = f.render("Enter - начать игру", False,
+                      END_TEXT_COLOR)
+    text6 = f.render("Space - остановить игру", False,
+                      END_TEXT_COLOR)
+    
+     
+    surface.blit(text, (WIN_WIDTH * 0.2, WIN_HEIGHT * 0.3))
+    surface.blit(text2, (WIN_WIDTH * 0.2, WIN_HEIGHT * 0.4))
+    surface.blit(text3, (WIN_WIDTH * 0.2, WIN_HEIGHT * 0.45))
+    surface.blit(text4, (WIN_WIDTH * 0.2, WIN_HEIGHT * 0.55))
+    surface.blit(text5, (WIN_WIDTH * 0.2, WIN_HEIGHT * 0.6))
+    surface.blit(text6, (WIN_WIDTH * 0.2, WIN_HEIGHT * 0.65))
+    pygame.display.update()
+    while True:
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_RETURN]:
+            break
+        for i in pygame.event.get():
+            if i.type == pygame.QUIT:
+                sys.exit()
 
 def end_of_game(surface, time):
-    sc.fill(BLACK)
+    surface.fill(BLACK)
     
     f = pygame.font.SysFont('arial', 48)
     text = f.render("Вы проиграли! Продержавшись {:.2f} секунд".format(time), False,
@@ -249,8 +287,8 @@ def end_of_game(surface, time):
                       END_TEXT_COLOR)
     
      
-    sc.blit(text, (WIN_WIDTH * 0.3, WIN_HEIGHT * 0.3))
-    sc.blit(text2, (WIN_WIDTH * 0.3, WIN_HEIGHT * 0.4))
+    surface.blit(text, (WIN_WIDTH * 0.3, WIN_HEIGHT * 0.3))
+    surface.blit(text2, (WIN_WIDTH * 0.3, WIN_HEIGHT * 0.4))
     pygame.display.update()
      
     for i in pygame.event.get():
@@ -264,91 +302,99 @@ def game_restart(surface, wall_list):
     return (time.time(), obj_list, player)
 
 pygame.font.init()
-description()
 sc = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+game_start(sc)
 sc.fill(GREEN)
 pygame.display.update()
-motion = True
+game_stop = True
 clock = pygame.time.Clock()
 player = Player(sc, PLAYER_START, PLAYER_SPEED)
 wall_list = init_walls(sc)
 obj_list = wall_list + [player]
 sc.blit(player.surf, player.rect)
 last_gen = start_time = time.time()
+dif_time = 0
 
 pygame.display.update()
 game_end = False
+game_stop = False
 
 while True:
     clock.tick(FPS)
     if game_end:
-        end_of_game(sc, start_time)
+        end_of_game(sc, dif_time)
         keys = pygame.key.get_pressed()
         if keys[pygame.K_RETURN]:
             start_time, obj_list, player = game_restart(sc, wall_list)
+            dif_time = 0
             game_end = False
         continue
     for i in pygame.event.get():
         if i.type == pygame.QUIT:
             sys.exit()
         if i.type == pygame.KEYDOWN and i.key == pygame.K_SPACE:
-            motion = False if motion else True
+            game_stop = False if game_stop else True
+            if game_stop:
+                dif_time += time.time()
+            else:
+                dif_time -= time.time()
     cur_time = time.time()
-    if cur_time - last_gen > GENERATOR_FREQ:
-        pos = (randint(0, WIN_WIDTH), randint(0, WIN_HEIGHT))
-        color = (randint(0, 255), randint(0, 255), randint(0, 255))
-        radius = BALL_RADIUS
-        while True:
-            unable_create = False
-            for obj in obj_list:
-                if obj.type == "ball" and \
-                   (pos[0] - obj.pos[0]) ** 2 + \
-                   (pos[1] - obj.pos[1])**2 <= (radius + obj.radius) ** 2:
-                    unable_create = True
-                    break
-                if obj.type == "wall":
-                    dif = (pos[0] - obj.start[0], pos[1] - obj.start[1])
-                    if 0 <= dif[0] <= obj.params[0] and \
-                       0 <= dif[1] <= obj.params[1] or \
-                       intercect_line_circle(*pos, radius, *obj.start,
-                                             obj.start[0],
-                                             obj.start[1] + obj.params[1]) or \
-                       intercect_line_circle(*pos, radius,
-                                             obj.start[0] + obj.params[0],
-                                             obj.start[1],
-                                             obj.start[0] + obj.params[0],
-                                             obj.start[1] + obj.params[1]) or \
-                       intercect_line_circle(*pos, radius, *obj.start,
-                                             obj.start[0] + obj.params[0],
-                                             obj.start[1]) or \
-                       intercect_line_circle(*pos, radius, obj.start[0],
-                                             obj.start[1] + obj.params[1],
-                                             obj.start[0] + obj.params[0],
-                                             obj.start[1] + obj.params[1]):
-                        unable_create = True
-                        break
-                if obj.type == "player":
-                    dot1 = (obj.x - obj.surf.get_width() // 2,
-                            obj.y - obj.surf.get_height() // 2)
-                    dot2 = (obj.x - obj.surf.get_width() // 2,
-                            obj.y + obj.surf.get_height() // 2)
-                    dot3 = (obj.x + obj.surf.get_width() // 2,
-                            obj.y - obj.surf.get_height() // 2)
-                    dot4 = (obj.x + obj.surf.get_width() // 2,
-                            obj.y + obj.surf.get_height() // 2)
-                    if point_in_circle(dot1, pos, radius) or \
-                       point_in_circle(dot2, pos, radius) or \
-                       point_in_circle(dot3, pos, radius) or \
-                       point_in_circle(dot4, pos, radius):
-                        unable_create = True
-                        break
-            if not unable_create:
-                new_elem = Ball(sc, pos, color, radius)
-                obj_list.append(new_elem)
-                break
+    if not game_stop:
+        if cur_time - last_gen > GENERATOR_FREQ:
             pos = (randint(0, WIN_WIDTH), randint(0, WIN_HEIGHT))
-        last_gen = time.time()
-    if motion:
+            color = (randint(0, 255), randint(0, 255), randint(0, 255))
+            radius = BALL_RADIUS
+            while True:
+                unable_create = False
+                for obj in obj_list:
+                    if obj.type == "ball" and \
+                       (pos[0] - obj.pos[0]) ** 2 + \
+                       (pos[1] - obj.pos[1])**2 <= (radius + obj.radius) ** 2:
+                        unable_create = True
+                        break
+                    if obj.type == "wall":
+                        dif = (pos[0] - obj.start[0], pos[1] - obj.start[1])
+                        if 0 <= dif[0] <= obj.params[0] and \
+                           0 <= dif[1] <= obj.params[1] or \
+                           intercect_line_circle(*pos, radius, *obj.start,
+                                                 obj.start[0],
+                                                 obj.start[1] + obj.params[1]) or \
+                           intercect_line_circle(*pos, radius,
+                                                 obj.start[0] + obj.params[0],
+                                                 obj.start[1],
+                                                 obj.start[0] + obj.params[0],
+                                                 obj.start[1] + obj.params[1]) or \
+                           intercect_line_circle(*pos, radius, *obj.start,
+                                                 obj.start[0] + obj.params[0],
+                                                 obj.start[1]) or \
+                           intercect_line_circle(*pos, radius, obj.start[0],
+                                                 obj.start[1] + obj.params[1],
+                                                 obj.start[0] + obj.params[0],
+                                                 obj.start[1] + obj.params[1]):
+                            unable_create = True
+                            break
+                    if obj.type == "player":
+                        dot1 = (obj.x - obj.surf.get_width() // 2,
+                                obj.y - obj.surf.get_height() // 2)
+                        dot2 = (obj.x - obj.surf.get_width() // 2,
+                                obj.y + obj.surf.get_height() // 2)
+                        dot3 = (obj.x + obj.surf.get_width() // 2,
+                                obj.y - obj.surf.get_height() // 2)
+                        dot4 = (obj.x + obj.surf.get_width() // 2,
+                                obj.y + obj.surf.get_height() // 2)
+                        if point_in_circle(dot1, pos, radius) or \
+                           point_in_circle(dot2, pos, radius) or \
+                           point_in_circle(dot3, pos, radius) or \
+                           point_in_circle(dot4, pos, radius):
+                            unable_create = True
+                            break
+                if not unable_create:
+                    new_elem = Ball(sc, pos, color, radius)
+                    obj_list.append(new_elem)
+                    break
+                pos = (randint(0, WIN_WIDTH), randint(0, WIN_HEIGHT))
+            last_gen = time.time()
+    
         sc.fill(GREEN)
         tmp = obj_list
         if obj_list:
@@ -358,14 +404,14 @@ while True:
                         tmp = elem.move(tmp)
                         if not tmp:
                             game_end = True
-                            start_time = time.time() - start_time
+                            dif_time += time.time() - start_time
                             break
                     if elem.type == "wall":
                         elem.draw()
                 obj_list = tmp
             else:
                 game_end = True
-                start_time = time.time() - start_time
+                dif_time += time.time() - start_time
 
 
     pygame.display.update()
