@@ -5,6 +5,8 @@ import sys
 WIN_WIDTH = 1500
 WIN_HEIGHT = 1000
 WALL_WIDTH = 30
+WALL_WIDTH_2 = 50
+WALL_HEIGHT_2 = 500
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -134,9 +136,16 @@ def init_walls(surface):
                           (WIN_WIDTH, WALL_WIDTH), RED))
     wall_list.append(Wall(surface, (WIN_WIDTH // 2, WIN_HEIGHT // 2),
                           (WALL_WIDTH, WALL_WIDTH), RED))
+    wall_list.append(Wall(surface, (WIN_WIDTH // 4, WIN_HEIGHT * 0.3),
+                          (WALL_WIDTH_2, WALL_HEIGHT_2), RED))
     return wall_list
 
+def description():
+    print("Нажмите левой кнопкой мыши на экран, чтобы сгенирировать\n" + \
+          "шар, который будет двигаться в случайном направлении.\n" + \
+          "Чтобы остановить игру, нажмите Пробел")
 
+description()
 sc = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 sc.fill(BLACK)
 pygame.display.update()
@@ -144,6 +153,7 @@ motion = True
 clock = pygame.time.Clock()
 
 obj_list = init_walls(sc)
+
 
 while 1:
     clock.tick(FPS)
@@ -188,14 +198,14 @@ while 1:
         if i.type == pygame.KEYDOWN and i.key == pygame.K_SPACE:
             motion = False if motion else True
 
-    sc.fill((0, 0, 0))
-
-    tmp = obj_list
-    for elem in obj_list:
-        if elem.type == "ball" and motion:
-            tmp = elem.move(tmp)
-        if elem.type == "wall":
-            elem.draw()
-    obj_list = tmp
+    if motion:
+        sc.fill((0, 0, 0))
+        tmp = obj_list
+        for elem in obj_list:
+            if elem.type == "ball":
+                tmp = elem.move(tmp)
+            if elem.type == "wall":
+                elem.draw()
+        obj_list = tmp
 
     pygame.display.update()
