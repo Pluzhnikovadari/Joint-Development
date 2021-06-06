@@ -193,4 +193,10 @@ def gameLoop():
     quit()
 
 
-gameLoop()
+def main():
+    """App starting function."""
+    gameLoop()
+
+
+if __name__ == '__main__':
+    main()

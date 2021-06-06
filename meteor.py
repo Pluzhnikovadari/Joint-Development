@@ -345,6 +345,11 @@ def gameLoop():
     quit()
 
 
-input_name()
-pygame.key.set_repeat(10, 10)
-gameLoop()
+def main():
+    """App starting function."""
+    input_name()
+    pygame.key.set_repeat(10, 10)
+    gameLoop()
+
+if __name__ == '__main__':
+    main()

@@ -195,5 +195,11 @@ def gameLoop():
     quit()
 
 
-input_name()
-gameLoop()
+def main():
+    """App starting function."""
+    input_name()
+    gameLoop()
+
+
+if __name__ == '__main__':
+    main()
