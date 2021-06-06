@@ -377,6 +377,7 @@ def game_start(surface):
             break
         for i in pygame.event.get():
             if i.type == pygame.QUIT:
+                pygame.quit()
                 sys.exit()
 
 
@@ -405,6 +406,7 @@ def lose_game(surface, time, treasure_cnt):
 
     for i in pygame.event.get():
         if i.type == pygame.QUIT:
+            pygame.quit()
             sys.exit()
 
 
@@ -427,6 +429,7 @@ def win_game(surface, time):
 
     for i in pygame.event.get():
         if i.type == pygame.QUIT:
+            pygame.quit()
             sys.exit()
 
 
@@ -439,8 +442,7 @@ def game_restart(surface, wall_list):
     surface.blit(player.surf, player.rect)
     return (time.time(), treasure_list, obj_list, player)
 
-
-if __name__ == "__main__":
+def start_labirint():
     pygame.font.init()
     sc = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
     game_start(sc)
@@ -480,6 +482,7 @@ if __name__ == "__main__":
             continue
         for i in pygame.event.get():
             if i.type == pygame.QUIT:
+                pygame.quit()
                 sys.exit()
             if i.type == pygame.KEYDOWN and i.key == pygame.K_SPACE:
                 game_stop = False if game_stop else True
@@ -568,3 +571,5 @@ if __name__ == "__main__":
                     dif_time += time.time() - start_time
 
         pygame.display.update()
+if __name__ == "__main__":
+    start_labirint()
