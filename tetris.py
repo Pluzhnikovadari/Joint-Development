@@ -1,4 +1,4 @@
-"""Игра тетрис."""
+"""Tetris game."""
 import pygame
 import random
 from forms import S, Z, J, L, T, II, OO
@@ -15,13 +15,13 @@ shape_colors = [(0, 255, 0), (255, 0, 0), (0, 255, 255), (255, 255, 0),
 
 
 class Piece:
-    """Класс-форма."""
+    """Form class."""
 
     rows = 20
     columns = 10
 
     def __init__(self, column, row, shape):
-        """Создание формы."""
+        """Create of form."""
         self.x = column
         self.y = row
         self.shape = shape
@@ -30,7 +30,7 @@ class Piece:
 
 
 def create_grid(locked_positions={}):
-    """Создание сетки."""
+    """Create of grid."""
     grid = [[(0, 0, 0) for x in range(10)] for x in range(20)]
     for i in range(len(grid)):
         for j in range(len(grid[i])):
@@ -41,7 +41,7 @@ def create_grid(locked_positions={}):
 
 
 def convert_shape_format(shape):
-    """Переворот формы."""
+    """Convert shape."""
     positions = []
     format = shape.shape[shape.rotation % len(shape.shape)]
     for i, line in enumerate(format):
@@ -55,7 +55,7 @@ def convert_shape_format(shape):
 
 
 def valid_space(shape, grid):
-    """Доступное место."""
+    """Validate space at the game."""
     accepted_positions = [[(j, i) for j in range(10) if
                            grid[i][j] == (0, 0, 0)] for i in range(20)]
     accepted_positions = [j for sub in accepted_positions for j in sub]
@@ -68,7 +68,7 @@ def valid_space(shape, grid):
 
 
 def check_lost(positions):
-    """Проверка на поражение."""
+    """Check for losing."""
     for pos in positions:
         x, y = pos
         if y < 1:
@@ -77,13 +77,13 @@ def check_lost(positions):
 
 
 def get_shape():
-    """Получение формы."""
+    """Take form."""
     global shapes, shape_colors
     return Piece(5, 0, random.choice(shapes))
 
 
 def draw_text_middle(text, size, color, surface):
-    """Отрисовка текста."""
+    """Text drawing."""
     font = pygame.font.SysFont('stxingkai', size, bold=True)
     label = font.render(text, 1, color)
     surface.blit(label,
@@ -92,7 +92,7 @@ def draw_text_middle(text, size, color, surface):
 
 
 def draw_grid(surface, row, col):
-    """Отрисовка сетки."""
+    """Grid drawing."""
     sx = top_left_x
     sy = top_left_y
     for i in range(row):
@@ -104,7 +104,7 @@ def draw_grid(surface, row, col):
 
 
 def clear_rows(grid, locked):
-    """Очистка строк."""
+    """Rows cleaning."""
     inc = 0
     for i in range(len(grid) - 1, -1, -1):
         row = grid[i]
@@ -125,7 +125,7 @@ def clear_rows(grid, locked):
 
 
 def draw_next_shape(shape, surface):
-    """Отрисовка следующей формы сбоку."""
+    """Drawing of next form."""
     font = pygame.font.SysFont('comicsans', 30)
     label = font.render('Next Shape', 1, (255, 255, 255))
 
@@ -144,7 +144,7 @@ def draw_next_shape(shape, surface):
 
 
 def draw_window(surface):
-    """Отрисовка игрового окна."""
+    """Window drawing."""
     surface.fill((0, 0, 0))
     # Tetris Title
     font = pygame.font.SysFont('stxingkai', 60)
@@ -162,7 +162,7 @@ def draw_window(surface):
 
 
 def start():
-    """Запуск игры."""
+    """Start game."""
     global grid
     locked_positions = {}  # (x,y):(255,0,0)
     grid = create_grid(locked_positions)
@@ -239,7 +239,7 @@ def start():
 
 
 def main_menu():
-    """Главное меню."""
+    """Game menu."""
     pygame.font.init()
     global win
     win = pygame.display.set_mode((s_width, s_height))
