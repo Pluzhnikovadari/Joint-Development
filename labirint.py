@@ -435,8 +435,8 @@ def win_game(surface, time):
 
 def game_restart(surface, wall_list):
     """Restart the game."""
-    player = Player(sc, PLAYER_START, PLAYER_SPEED)
-    treasure_list = init_treasures(sc, wall_list)
+    player = Player(surface, PLAYER_START, PLAYER_SPEED)
+    treasure_list = init_treasures(surface, wall_list)
     obj_list = wall_list + treasure_list + [player]
     surface.fill(BACKGROUND_COLOR)
     surface.blit(player.surf, player.rect)
