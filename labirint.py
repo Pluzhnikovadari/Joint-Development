@@ -11,16 +11,20 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
-END_TEXT_COLOR = (200, 20, 20)
+LOSE_TEXT_COLOR = (200, 20, 20)
 START_TEXT_COLOR = (0, 139, 139)
+WIN_TEXT_COLOR = START_TEXT_COLOR
 WALL_COLOR = (139, 100, 50)
 START_MENU_COLOR = (255, 140, 0)
 BACKGROUND_COLOR = (154, 205, 50)
+WIN_COLOR = START_MENU_COLOR
+LOSE_COLOR = (0, 0, 0)
 FPS = 60
 PLAYER_START = (WIN_WIDTH // 2, WIN_HEIGHT // 2)
 PLAYER_SPEED = 5
 GENERATOR_FREQ = 1
 BALL_RADIUS = 20
+TREASURE_NUMBER = 8
 
 
 def intercect_line_circle(x0, y0, r, x1, y1, x2, y2):
@@ -158,6 +162,22 @@ class Ball:
         pygame.draw.circle(self.surf, self.color, self.pos, self.radius)
         return objects
 
+class Treasure:
+    def __init__(self, parent_surf, pos, number):
+        self.sc = parent_surf
+        self.number = number
+        self.flag = True
+        self.surf = pygame.image.load('images/flower.png').convert()
+        self.surf.set_colorkey((255, 255, 255))
+        self.type = "treasure"
+        resize = (self.surf.get_width() // 30, self.surf.get_height() // 30)
+        self.surf = pygame.transform.scale(self.surf, resize)
+        self.x, self.y = pos
+        self.rect = self.surf.get_rect(center=(self.x, self.y))
+
+    def draw(self):
+        if self.flag:
+            self.sc.blit(self.surf, self.rect)
 
 class Player:
     def __init__(self, parent_surf, pos, speed):
@@ -200,13 +220,14 @@ class Player:
         dot4 = (self.x + rot.get_width() // 2 + delta_x,
                 self.y + rot.get_height() // 2 + delta_y)
 
+        flag = -1
         for obj in objects:
             if obj.type == "ball":
                 if point_in_circle(dot1, obj.pos, obj.radius) or \
                    point_in_circle(dot2, obj.pos, obj.radius) or \
                    point_in_circle(dot3, obj.pos, obj.radius) or \
                    point_in_circle(dot4, obj.pos, obj.radius):
-                    return False
+                    flag = -2
             if obj.type == "wall":
                 if point_in_rect(dot1, obj.start, obj.params) or \
                    point_in_rect(dot2, obj.start, obj.params) or \
@@ -214,6 +235,16 @@ class Player:
                    point_in_rect(dot4, obj.start, obj.params):
                     move = False
                     break
+            if obj.type == "treasure":
+                if obj.flag and (point_in_rect((obj.x, obj.y), dot1,
+                                 (rot.get_width(), rot.get_height())) or \
+                   point_in_rect((obj.x, obj.y), dot1,
+                                 (rot.get_width(), rot.get_height())) or \
+                   point_in_rect((obj.x, obj.y), dot1,
+                                 (rot.get_width(), rot.get_height())) or \
+                   point_in_rect((obj.x, obj.y), dot1,
+                                 (rot.get_width(), rot.get_height()))):
+                    flag = obj.number
         if move:
             self.x += delta_x
             self.y += delta_y
@@ -221,7 +252,7 @@ class Player:
             rot = pygame.transform.rotate(self.surf, self.degree)
             rot_rect = rot.get_rect(center=(self.x, self.y))
         self.sc.blit(rot, rot_rect)
-        return True
+        return flag
 
 
 def init_walls(surface):
@@ -265,6 +296,33 @@ def init_walls(surface):
                           (70, 50), WALL_COLOR))
     return wall_list
 
+def init_treasures(surface, wall_list):
+    treasure_list = []
+    for i in range(TREASURE_NUMBER):
+        while True:
+            pos = (randint(0, WIN_WIDTH), randint(0, WIN_HEIGHT))
+            new_treasure = Treasure(surface, pos, i)
+            dot1 = (new_treasure.x - new_treasure.surf.get_width() // 2,
+                    new_treasure.y - new_treasure.surf.get_height() // 2)
+            dot2 = (new_treasure.x - new_treasure.surf.get_width() // 2,
+                    new_treasure.y + new_treasure.surf.get_height() // 2)
+            dot3 = (new_treasure.x + new_treasure.surf.get_width() // 2,
+                    new_treasure.y - new_treasure.surf.get_height() // 2)
+            dot4 = (new_treasure.x + new_treasure.surf.get_width() // 2,
+                    new_treasure.y + new_treasure.surf.get_height() // 2)
+            gen_able = True
+            for wall in wall_list:
+                if point_in_rect(dot1, wall.start, wall.params) or \
+                   point_in_rect(dot2, wall.start, wall.params) or \
+                   point_in_rect(dot3, wall.start, wall.params) or \
+                   point_in_rect(dot4, wall.start, wall.params):
+                    gen_able = False
+                    break
+            if gen_able:
+                treasure_list.append(new_treasure)
+                break
+    return treasure_list
+
 
 def game_start(surface):
     surface.fill(START_MENU_COLOR)
@@ -299,17 +357,49 @@ def game_start(surface):
                 sys.exit()
 
 
-def end_of_game(surface, time):
-    surface.fill(BLACK)
+def lose_game(surface, time, treasure_cnt):
+    surface.fill(LOSE_COLOR)
 
     f = pygame.font.SysFont('arial', 48)
-    text = f.render("Вы проиграли! Продержавшись {:.2f} секунд".format(time),
-                    False, END_TEXT_COLOR)
-    text2 = f.render("Чтобы начать заново нажмите Enter", False,
-                     END_TEXT_COLOR)
+    text = f.render("Вы проиграли!".format(time),
+                    False, LOSE_TEXT_COLOR)
+    if treasure_cnt == 1 and treasure_cnt != 11:
+        form = "цветок"
+    elif 2 <= treasure_cnt % 10 <= 4 and treasure_cnt // 10 != 1:
+        form = "цветка"
+    else:
+        form = "цветков"
+    text2 = f.render("Вам удалось собрать {} {}".format(treasure_cnt, form),
+                    False, LOSE_TEXT_COLOR)
+    text3 = f.render("и продержаться {:.2f} секунд".format(time),
+                    False, LOSE_TEXT_COLOR)
+    text4 = f.render("Чтобы начать заново нажмите Enter", False,
+                     LOSE_TEXT_COLOR)
 
-    surface.blit(text, (WIN_WIDTH * 0.3, WIN_HEIGHT * 0.3))
-    surface.blit(text2, (WIN_WIDTH * 0.3, WIN_HEIGHT * 0.4))
+    surface.blit(text, (WIN_WIDTH * 0.2, WIN_HEIGHT * 0.3))
+    surface.blit(text2, (WIN_WIDTH * 0.2, WIN_HEIGHT * 0.4))
+    surface.blit(text3, (WIN_WIDTH * 0.2, WIN_HEIGHT * 0.45))
+    surface.blit(text4, (WIN_WIDTH * 0.2, WIN_HEIGHT * 0.55))
+    pygame.display.update()
+
+    for i in pygame.event.get():
+        if i.type == pygame.QUIT:
+            sys.exit()
+
+def win_game(surface, time):
+    surface.fill(WIN_COLOR)
+
+    f = pygame.font.SysFont('arial', 48)
+    text = f.render("Вы выиграли!".format(time),
+                    False, WIN_TEXT_COLOR)
+    text2 = f.render("Вам удалось собрать все цветы за {:.2f} секунд".format(time),
+                    False, WIN_TEXT_COLOR)
+    text3 = f.render("Чтобы начать заново нажмите Enter", False,
+                     WIN_TEXT_COLOR)
+
+    surface.blit(text, (WIN_WIDTH * 0.2, WIN_HEIGHT * 0.3))
+    surface.blit(text2, (WIN_WIDTH * 0.2, WIN_HEIGHT * 0.4))
+    surface.blit(text3, (WIN_WIDTH * 0.2, WIN_HEIGHT * 0.5))
     pygame.display.update()
 
     for i in pygame.event.get():
@@ -319,10 +409,11 @@ def end_of_game(surface, time):
 
 def game_restart(surface, wall_list):
     player = Player(sc, PLAYER_START, PLAYER_SPEED)
-    obj_list = wall_list + [player]
-    surface.fill(BLACK)
+    treasure_list = init_treasures(sc, wall_list)
+    obj_list = wall_list + treasure_list + [player]
+    surface.fill(BACKGROUND_COLOR)
     surface.blit(player.surf, player.rect)
-    return (time.time(), obj_list, player)
+    return (time.time(), treasure_list, obj_list, player)
 
 
 pygame.font.init()
@@ -332,9 +423,13 @@ sc.fill(BACKGROUND_COLOR)
 pygame.display.update()
 game_stop = True
 clock = pygame.time.Clock()
+
 player = Player(sc, PLAYER_START, PLAYER_SPEED)
 wall_list = init_walls(sc)
-obj_list = wall_list + [player]
+treasure_list = init_treasures(sc, wall_list)
+treasure_cnt = 0
+
+obj_list = wall_list + treasure_list + [player]
 sc.blit(player.surf, player.rect)
 last_gen = start_time = time.time()
 dif_time = 0
@@ -346,11 +441,15 @@ game_stop = False
 while True:
     clock.tick(FPS)
     if game_end:
-        end_of_game(sc, dif_time)
+        if treasure_cnt == TREASURE_NUMBER:
+            win_game(sc, dif_time)
+        else:
+            lose_game(sc, dif_time, treasure_cnt)
         keys = pygame.key.get_pressed()
         if keys[pygame.K_RETURN]:
-            start_time, obj_list, player = game_restart(sc, wall_list)
+            start_time, treasure_list, obj_list, player = game_restart(sc, wall_list)
             dif_time = 0
+            treasure_cnt = 0
             game_end = False
         continue
     for i in pygame.event.get():
@@ -417,17 +516,25 @@ while True:
         sc.fill(BACKGROUND_COLOR)
         tmp = obj_list
         if obj_list:
-            if player.move(tmp):
-                for elem in obj_list:
-                    if elem.type == "ball":
-                        tmp = elem.move(tmp)
-                        if not tmp:
-                            game_end = True
-                            dif_time += time.time() - start_time
-                            break
-                    if elem.type == "wall":
-                        elem.draw()
-                obj_list = tmp
+            treasure_catch = player.move(tmp)
+            if treasure_catch != -2:
+                if treasure_catch != -1:
+                    treasure_cnt += 1
+                    obj_list[len(wall_list) + treasure_catch].flag = False
+                if treasure_cnt == TREASURE_NUMBER:
+                    game_end = True
+                    dif_time += time.time() - start_time
+                else:
+                    for elem in obj_list:
+                        if elem.type == "ball":
+                            tmp = elem.move(tmp)
+                            if not tmp:
+                                game_end = True
+                                dif_time += time.time() - start_time
+                                break
+                        if elem.type == "wall" or elem.type == "treasure":
+                            elem.draw()
+                    obj_list = tmp
             else:
                 game_end = True
                 dif_time += time.time() - start_time
