@@ -1,8 +1,11 @@
+"""Крестики-нолики."""
 import pygame
 import sys
 
 
 class Game:
+    """Класс-игра."""
+
     size_block = 100
     margin = 1
     width = heigth = size_block * 3 + margin * 3
@@ -17,13 +20,14 @@ class Game:
     screen = 1
 
     def start(self):
+        """Запуск игры."""
         pygame.init()
         self.screen = pygame.display.set_mode(Game.size_window)
         pygame.display.set_caption('TicTacToe')
         self.game_loop()
 
     def mouse(self):
-
+        """Обработка кликов мыши."""
         x_mouse, y_mouse = pygame.mouse.get_pos()
         col = x_mouse // (Game.size_block + Game.margin)
         row = y_mouse // (Game.size_block + Game.margin)
@@ -35,12 +39,14 @@ class Game:
             self.query += 1
 
     def space(self):
+        """Обработка перезапуска игры."""
         self.query = 0
         self.mas = [[0] * 3 for _ in range(3)]
         self.end = ''
         self.screen.fill(Game.black)
 
     def draw_x(self, x, y):
+        """Отрисовка крестика."""
         pygame.draw.line(self.screen, Game.white, (x + 2, y + 2),
                          (x + Game.size_block - 2, y + Game.size_block - 2), 3)
         pygame.draw.line(self.screen, Game.white,
@@ -48,12 +54,14 @@ class Game:
                          (x + Game.size_block - 2, y + 2), 3)
 
     def draw_o(self, x, y):
+        """Отрисовка нолика."""
         pygame.draw.circle(self.screen, Game.white,
                            (x + Game.size_block // 2,
                             y + Game.size_block // 2),
                            Game.size_block // 2 - 3, 3)
 
     def check_winner(self):
+        """Проверка на победителя."""
         win = [(0, 1, 2), (3, 4, 5), (6, 7, 8), (2, 4, 6),
                (0, 3, 6), (1, 4, 7), (2, 5, 8), (0, 4, 8)]
         for i in win:
@@ -70,6 +78,7 @@ class Game:
         return 0
 
     def game_loop(self):
+        """Основной цикл игры."""
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -105,7 +114,7 @@ class Game:
                 font = pygame.font.SysFont('stxingkai', 20)
                 cur = 'Нажмите пробел, чтобы начать заново'
                 text1 = font.render(self.end, True, Game.white)
-                cur = font.render(cur, True, Game.white) 
+                cur = font.render(cur, True, Game.white)
                 text_rect = text1.get_rect()
                 text_x = self.screen.get_width() / 2 - text_rect.width / 2
                 text_y = self.screen.get_height() / 2 - text_rect.height / 2
