@@ -12,7 +12,10 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 END_TEXT_COLOR = (200, 20, 20)
-WALL_COLOR = (200, 200, 30)
+START_TEXT_COLOR = (0, 139, 139)
+WALL_COLOR = (139, 100, 50)
+START_MENU_COLOR = (255, 140, 0)
+BACKGROUND_COLOR = (154, 205, 50)
 FPS = 60
 PLAYER_START = (WIN_WIDTH // 2, WIN_HEIGHT // 2)
 PLAYER_SPEED = 5
@@ -51,12 +54,15 @@ def intercect_line_circle(x0, y0, r, x1, y1, x2, y2):
             return False
     return True
 
+
 def point_in_rect(pos, start, params):
     return start[0] <= pos[0] <= start[0] + params[0] and \
            start[1] <= pos[1] <= start[1] + params[1]
 
+
 def point_in_circle(pos, start, radius):
     return (pos[0] - start[0])**2 + (pos[1] - start[1])**2 <= radius**2
+
 
 class Wall:
     def __init__(self, surface, start, params, color):
@@ -148,10 +154,10 @@ class Ball:
                    point_in_circle(dot4, self.pos, self.radius):
                     return False
 
-
         self.pos = (self.pos[0] + self.dx, self.pos[1] + self.dy)
         pygame.draw.circle(self.surf, self.color, self.pos, self.radius)
         return objects
+
 
 class Player:
     def __init__(self, parent_surf, pos, speed):
@@ -160,16 +166,14 @@ class Player:
         self.surf.set_colorkey((255, 255, 255))
         self.degree = 0
         self.type = "player"
-        self.surf = pygame.transform.scale(self.surf,
-                    (self.surf.get_width() // 12, self.surf.get_height() // 12))
-
+        resize = (self.surf.get_width() // 12, self.surf.get_height() // 12)
+        self.surf = pygame.transform.scale(self.surf, resize)
         self.x, self.y = pos
         self.speed = speed
         self.rect = self.surf.get_rect(center=(self.x, self.y))
-        sc.blit(self.surf, self.rect)
+        self.sc.blit(self.surf, self.rect)
 
     def move(self, objects):
-        motion = True
         keys = pygame.key.get_pressed()
         delta_x = delta_y = 0
         if keys[pygame.K_LEFT]:
@@ -219,10 +223,13 @@ class Player:
         self.sc.blit(rot, rot_rect)
         return True
 
+
 def init_walls(surface):
     wall_list = []
-    wall_list.append(Wall(surface, (0, 0), (WALL_WIDTH, WIN_HEIGHT), WALL_COLOR))
-    wall_list.append(Wall(surface, (0, 0), (WIN_WIDTH, WALL_WIDTH), WALL_COLOR))
+    wall_list.append(Wall(surface, (0, 0), (WALL_WIDTH, WIN_HEIGHT),
+                          WALL_COLOR))
+    wall_list.append(Wall(surface, (0, 0), (WIN_WIDTH, WALL_WIDTH),
+                          WALL_COLOR))
     wall_list.append(Wall(surface, (WIN_WIDTH - WALL_WIDTH, 0),
                           (WALL_WIDTH, WIN_HEIGHT), WALL_COLOR))
     wall_list.append(Wall(surface, (WALL_WIDTH, WIN_HEIGHT - WALL_WIDTH),
@@ -242,26 +249,40 @@ def init_walls(surface):
                           (50, 200), WALL_COLOR))
     wall_list.append(Wall(surface, (600, 650),
                           (200, 50), WALL_COLOR))
+    wall_list.append(Wall(surface, (120, 650),
+                          (120, 50), WALL_COLOR))
+    wall_list.append(Wall(surface, (90, 450),
+                          (210, 50), WALL_COLOR))
+    wall_list.append(Wall(surface, (150, 230),
+                          (70, 70), WALL_COLOR))
+    wall_list.append(Wall(surface, (550, 85),
+                          (125, 63), WALL_COLOR))
+    wall_list.append(Wall(surface, (950, 90),
+                          (50, 90), WALL_COLOR))
+    wall_list.append(Wall(surface, (60, 90),
+                          (70, 50), WALL_COLOR))
+    wall_list.append(Wall(surface, (420, 700),
+                          (70, 50), WALL_COLOR))
     return wall_list
 
+
 def game_start(surface):
-    surface.fill(GREEN)
-    
+    surface.fill(START_MENU_COLOR)
+
     f = pygame.font.SysFont('arial', 48)
     text = f.render("Добро пожаловать в нашу увлекательную игру!", False,
-                      END_TEXT_COLOR)
+                    START_TEXT_COLOR)
     text2 = f.render("Ваша задача: уклоняясь от шаров продержаться", False,
-                      END_TEXT_COLOR)
+                     START_TEXT_COLOR)
     text3 = f.render("на поле как можно дольше", False,
-                      END_TEXT_COLOR)
+                     START_TEXT_COLOR)
     text4 = f.render("Управление:", False,
-                      END_TEXT_COLOR)
+                     START_TEXT_COLOR)
     text5 = f.render("Enter - начать игру", False,
-                      END_TEXT_COLOR)
+                     START_TEXT_COLOR)
     text6 = f.render("Space - остановить игру", False,
-                      END_TEXT_COLOR)
-    
-     
+                     START_TEXT_COLOR)
+
     surface.blit(text, (WIN_WIDTH * 0.2, WIN_HEIGHT * 0.3))
     surface.blit(text2, (WIN_WIDTH * 0.2, WIN_HEIGHT * 0.4))
     surface.blit(text3, (WIN_WIDTH * 0.2, WIN_HEIGHT * 0.45))
@@ -277,23 +298,25 @@ def game_start(surface):
             if i.type == pygame.QUIT:
                 sys.exit()
 
+
 def end_of_game(surface, time):
     surface.fill(BLACK)
-    
+
     f = pygame.font.SysFont('arial', 48)
-    text = f.render("Вы проиграли! Продержавшись {:.2f} секунд".format(time), False,
-                      END_TEXT_COLOR)
+    text = f.render("Вы проиграли! Продержавшись {:.2f} секунд".format(time),
+                    False, END_TEXT_COLOR)
     text2 = f.render("Чтобы начать заново нажмите Enter", False,
-                      END_TEXT_COLOR)
-    
-     
+                     END_TEXT_COLOR)
+
     surface.blit(text, (WIN_WIDTH * 0.3, WIN_HEIGHT * 0.3))
     surface.blit(text2, (WIN_WIDTH * 0.3, WIN_HEIGHT * 0.4))
     pygame.display.update()
-     
+
     for i in pygame.event.get():
         if i.type == pygame.QUIT:
             sys.exit()
+
+
 def game_restart(surface, wall_list):
     player = Player(sc, PLAYER_START, PLAYER_SPEED)
     obj_list = wall_list + [player]
@@ -301,10 +324,11 @@ def game_restart(surface, wall_list):
     surface.blit(player.surf, player.rect)
     return (time.time(), obj_list, player)
 
+
 pygame.font.init()
 sc = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 game_start(sc)
-sc.fill(GREEN)
+sc.fill(BACKGROUND_COLOR)
 pygame.display.update()
 game_stop = True
 clock = pygame.time.Clock()
@@ -354,23 +378,18 @@ while True:
                         break
                     if obj.type == "wall":
                         dif = (pos[0] - obj.start[0], pos[1] - obj.start[1])
+                        x1, x2 = obj.start[0], obj.start[0] + obj.params[0]
+                        y1, y2 = obj.start[1], obj.start[1] + obj.params[1]
                         if 0 <= dif[0] <= obj.params[0] and \
                            0 <= dif[1] <= obj.params[1] or \
-                           intercect_line_circle(*pos, radius, *obj.start,
-                                                 obj.start[0],
-                                                 obj.start[1] + obj.params[1]) or \
-                           intercect_line_circle(*pos, radius,
-                                                 obj.start[0] + obj.params[0],
-                                                 obj.start[1],
-                                                 obj.start[0] + obj.params[0],
-                                                 obj.start[1] + obj.params[1]) or \
-                           intercect_line_circle(*pos, radius, *obj.start,
-                                                 obj.start[0] + obj.params[0],
-                                                 obj.start[1]) or \
-                           intercect_line_circle(*pos, radius, obj.start[0],
-                                                 obj.start[1] + obj.params[1],
-                                                 obj.start[0] + obj.params[0],
-                                                 obj.start[1] + obj.params[1]):
+                           intercect_line_circle(*pos, radius, x1, y1,
+                                                 x1, y2) or \
+                           intercect_line_circle(*pos, radius, x2, y1,
+                                                 x2, y2) or \
+                           intercect_line_circle(*pos, radius, x1, y1,
+                                                 x2, y1) or \
+                           intercect_line_circle(*pos, radius, x1, y2,
+                                                 x2, y2):
                             unable_create = True
                             break
                     if obj.type == "player":
@@ -394,8 +413,8 @@ while True:
                     break
                 pos = (randint(0, WIN_WIDTH), randint(0, WIN_HEIGHT))
             last_gen = time.time()
-    
-        sc.fill(GREEN)
+
+        sc.fill(BACKGROUND_COLOR)
         tmp = obj_list
         if obj_list:
             if player.move(tmp):
@@ -412,6 +431,5 @@ while True:
             else:
                 game_end = True
                 dif_time += time.time() - start_time
-
 
     pygame.display.update()
