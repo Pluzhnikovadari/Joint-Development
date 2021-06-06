@@ -103,11 +103,14 @@ class Game:
             if self.end:
                 self.screen.fill(Game.black)
                 font = pygame.font.SysFont('stxingkai', 20)
+                cur = 'Нажмите пробел, чтобы начать заново'
                 text1 = font.render(self.end, True, Game.white)
+                cur = font.render(cur, True, Game.white) 
                 text_rect = text1.get_rect()
                 text_x = self.screen.get_width() / 2 - text_rect.width / 2
                 text_y = self.screen.get_height() / 2 - text_rect.height / 2
                 self.screen.blit(text1, (text_x, text_y))
+                self.screen.blit(cur, (text_x - 80, text_y + 20))
             pygame.display.update()
 
 
