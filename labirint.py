@@ -435,14 +435,16 @@ def win_game(surface, time):
 
 def game_restart(surface, wall_list):
     """Restart the game."""
-    player = Player(sc, PLAYER_START, PLAYER_SPEED)
-    treasure_list = init_treasures(sc, wall_list)
+    player = Player(surface, PLAYER_START, PLAYER_SPEED)
+    treasure_list = init_treasures(surface, wall_list)
     obj_list = wall_list + treasure_list + [player]
     surface.fill(BACKGROUND_COLOR)
     surface.blit(player.surf, player.rect)
     return (time.time(), treasure_list, obj_list, player)
 
+
 def start_labirint():
+    """Start main program."""
     pygame.font.init()
     sc = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
     game_start(sc)
@@ -571,5 +573,7 @@ def start_labirint():
                     dif_time += time.time() - start_time
 
         pygame.display.update()
+
+
 if __name__ == "__main__":
     start_labirint()
