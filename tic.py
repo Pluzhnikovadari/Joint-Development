@@ -83,7 +83,8 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    sys.exit(0)
+                    quit()
+                    sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN and not self.end:
                     self.mouse()
                 elif event.type == pygame.KEYDOWN and \

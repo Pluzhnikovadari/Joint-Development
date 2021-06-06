@@ -1,6 +1,7 @@
 """Tetris game."""
 import pygame
 import random
+import sys
 from forms import S, Z, J, L, T, II, OO
 s_width = 800
 s_height = 700
@@ -257,9 +258,13 @@ def main_menu():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+                pygame.quit()
+                quit()
+                sys.exit()
             if event.type == pygame.KEYDOWN:
                 start()
     pygame.quit()
+    quit()
 
 
 if __name__ == '__main__':
