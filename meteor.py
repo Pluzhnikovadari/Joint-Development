@@ -29,9 +29,9 @@ img_folder = os.path.join(game_folder, 'images')
 player_img = pygame.image.load(os.path.join(img_folder,
                                'ship.png')).convert_alpha()
 health_img = pygame.image.load(os.path.join(img_folder,
-                               'healf.png')).convert_alpha()
+                               'health.png')).convert_alpha()
 health_img_m = pygame.image.load(os.path.join(img_folder,
-                                 'healf_m.png')).convert_alpha()
+                                 'health_m.png')).convert_alpha()
 asteriod_img = pygame.image.load(os.path.join(img_folder,
                                  'asteroid.png')).convert_alpha()
 background = pygame.image.load(os.path.join(img_folder,
