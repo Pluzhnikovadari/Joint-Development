@@ -36,6 +36,9 @@ def input_name():
 
     while not done:
         for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     done = True
@@ -45,6 +48,8 @@ def input_name():
                     inp += event.unicode
 
         dis.fill(ground)
+        mesg = font_style.render("Input your name", True, black)
+        dis.blit(mesg, [100, 80])
         txt_surface = font_style.render(inp, True, color)
         width = max(200, txt_surface.get_width()+10)
         input_box.w = width
@@ -126,7 +131,8 @@ def gameLoop():
  
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                game_over = True
+                pygame.quit()
+                sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     x1_change = -snake_block
