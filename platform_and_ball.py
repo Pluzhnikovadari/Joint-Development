@@ -3,6 +3,7 @@ import time
 import random
  
 pygame.init()
+pygame.key.set_repeat(10, 10)
 
 FPS = 60
 ball_color = (102, 0, 153)
@@ -134,14 +135,15 @@ def gameLoop():
         paddle_x_change = 0 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                game_over = True
+                pygame.quit()
+                sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    paddle_speed += paddle_left(paddle_x)
+                    paddle_speed = paddle_left(paddle_x)
                     if not move:
                         move = True
                 elif event.key == pygame.K_RIGHT:
-                    paddle_speed += paddle_right(paddle_x)
+                    paddle_speed = paddle_right(paddle_x)
                     if not move:
                         move = True
 
