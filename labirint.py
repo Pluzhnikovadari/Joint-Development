@@ -392,7 +392,7 @@ def win_game(surface, time):
     f = pygame.font.SysFont('arial', 48)
     text = f.render("Вы выиграли!".format(time),
                     False, WIN_TEXT_COLOR)
-    text2 = f.render("Вам удалось собрать все цветы за {:.2f} секунд".format(time),
+    text2 = f.render("Вам удалось собрать все цветки за {:.2f} секунд".format(time),
                     False, WIN_TEXT_COLOR)
     text3 = f.render("Чтобы начать заново нажмите Enter", False,
                      WIN_TEXT_COLOR)
