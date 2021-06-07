@@ -3,7 +3,9 @@ from random import randint, random
 import pygame
 import sys
 import time
+import gettext
 
+gettext.install("messages", ".", names = ("ngettext",))
 
 WIN_WIDTH = 1500
 WIN_HEIGHT = 1000
@@ -351,17 +353,17 @@ def game_start(surface):
     surface.fill(START_MENU_COLOR)
 
     f = pygame.font.SysFont('arial', 48)
-    text = f.render("Welcome to Bug's Labirint game!", False,
+    text = f.render(_("Welcome to Bug's Labirint game!"), False,
                     START_TEXT_COLOR)
-    text2 = f.render("Your mission is to collect all the flowers", False,
+    text2 = f.render(_("Your mission is to collect all the flowers"), False,
                      START_TEXT_COLOR)
-    text3 = f.render("on the field until the balls catch up with you", False,
+    text3 = f.render(_("on the field until the balls catch up with you"), False,
                      START_TEXT_COLOR)
-    text4 = f.render("Key control:", False,
+    text4 = f.render(_("Key control:"), False,
                      START_TEXT_COLOR)
-    text5 = f.render("Enter - start game", False,
+    text5 = f.render(_("Enter - start game"), False,
                      START_TEXT_COLOR)
-    text6 = f.render("Space - stop game", False,
+    text6 = f.render(_("Space - stop game"), False,
                      START_TEXT_COLOR)
 
     surface.blit(text, (WIN_WIDTH * 0.2, WIN_HEIGHT * 0.3))
@@ -386,16 +388,16 @@ def lose_game(surface, time, treasure_cnt):
     surface.fill(LOSE_COLOR)
 
     f = pygame.font.SysFont('arial', 48)
-    text = f.render("You lose!", False, LOSE_TEXT_COLOR)
+    text = f.render(_("You lose!"), False, LOSE_TEXT_COLOR)
     if treasure_cnt == 1:
         form = "flower"
     else:
         form = "flowers"
-    text2 = f.render("You managed to collect {} {}".format(treasure_cnt, form),
+    text2 = f.render(_("You managed to collect {} {}").format(treasure_cnt, form),
                      False, LOSE_TEXT_COLOR)
-    text3 = f.render("and survived for {:.2f} seconds".format(time),
+    text3 = f.render(_("and survived for {:.2f} seconds").format(time),
                      False, LOSE_TEXT_COLOR)
-    text4 = f.render("Press Enter to restart", False,
+    text4 = f.render(_("Press Enter to restart"), False,
                      LOSE_TEXT_COLOR)
 
     surface.blit(text, (WIN_WIDTH * 0.2, WIN_HEIGHT * 0.3))
@@ -415,11 +417,11 @@ def win_game(surface, time):
     surface.fill(WIN_COLOR)
 
     f = pygame.font.SysFont('arial', 48)
-    text = f.render("You win!", False, WIN_TEXT_COLOR)
-    text2 = f.render("You managed to collect all flowers " +
-                     "for {:.2f} seconds".format(time),
+    text = f.render(_("You win!"), False, WIN_TEXT_COLOR)
+    text2 = f.render(_("You managed to collect all flowers ") +
+                     _("for {:.2f} seconds").format(time),
                      False, WIN_TEXT_COLOR)
-    text3 = f.render("Press Enter to restart", False,
+    text3 = f.render(_("Press Enter to restart"), False,
                      WIN_TEXT_COLOR)
 
     surface.blit(text, (WIN_WIDTH * 0.2, WIN_HEIGHT * 0.3))

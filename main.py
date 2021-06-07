@@ -7,6 +7,9 @@ import tic
 import snake
 import platform_and_ball
 import meteor
+import gettext
+
+gettext.install("messages", ".", names = ("ngettext",))
 
 
 class Application(tk.Frame):
@@ -20,17 +23,17 @@ class Application(tk.Frame):
 
     def createWidgets(self):
         """Create buttons."""
-        self.SnakeButton = tk.Button(self, text='Snake', command=self.snakebut)
-        self.PlatformButton = tk.Button(self, text='Platform and ball',
+        self.SnakeButton = tk.Button(self, text=_('Snake'), command=self.snakebut)
+        self.PlatformButton = tk.Button(self, text=_('Platform and ball'),
                                         command=self.platformbut)
-        self.MeteorButton = tk.Button(self, text='Meteor',
+        self.MeteorButton = tk.Button(self, text=_('Meteor'),
                                       command=self.meteorbut)
-        self.TicButton = tk.Button(self, text='Tic', command=self.ticbut)
-        self.TetrisButton = tk.Button(self, text='Tetris',
+        self.TicButton = tk.Button(self, text=_('Tic'), command=self.ticbut)
+        self.TetrisButton = tk.Button(self, text=_('Tetris'),
                                       command=self.tetrisbut)
-        self.LabirintButton = tk.Button(self, text="Bug's Labirint",
+        self.LabirintButton = tk.Button(self, text=_("Bug's Labirint"),
                                         command=self.labirintbut)
-        self.quitButton = tk.Button(self, text='Quit', command=self.quit)
+        self.quitButton = tk.Button(self, text=_('Quit'), command=self.quit)
 
         self.SnakeButton.grid(row=0, column=0, sticky='NEWS')
         self.PlatformButton.grid(row=0, column=1, sticky='NEWS')
@@ -78,5 +81,5 @@ class Application(tk.Frame):
 
 
 app = Application()
-app.master.title('Game application')
+app.master.title(_('Game application'))
 app.mainloop()
