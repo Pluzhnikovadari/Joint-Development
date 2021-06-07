@@ -3,9 +3,6 @@ from random import randint, random
 import pygame
 import sys
 import time
-import gettext
-
-gettext.install("messages", ".", names = ("ngettext",))
 
 WIN_WIDTH = 1500
 WIN_HEIGHT = 1000
