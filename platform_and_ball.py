@@ -3,8 +3,6 @@ import pygame
 import time
 import random
 import sys
-pygame.init()
-pygame.key.set_repeat(10, 10)
 FPS = 60
 ball_color = (102, 0, 153)
 paddle_color = (102, 51, 0)
@@ -16,39 +14,26 @@ platforms = [(139, 0, 0), (102, 0, 102), (0, 51, 51), (255, 204, 0)]
 dis_width = 600
 dis_height = 400
 
-dis = pygame.display.set_mode((dis_width, dis_height))
-pygame.display.set_caption('Paddle Game')
-clock = pygame.time.Clock()
-font_style = pygame.font.SysFont("bahnschrift", 25)
-score_font = pygame.font.SysFont("comicsansms", 35)
 
-paddle_x = 250
-ball = [150, 200]
-move_ball = [-2, -2]
-move = False
-game_close = False
-result = True
-
-
-def message(msg, color):
+def message(dis, msg, color, font_style):
     """System messages drawing."""
     mesg = font_style.render(msg, True, color)
     dis.blit(mesg, [dis_width / 3, dis_height / 3])
 
 
-def rect(start_x, start_y, color):
+def rect(dis, start_x, start_y, color):
     """Rectangle drawing."""
     pygame.draw.rect(dis, color, (start_x, start_y, 50, 15))
     pygame.draw.rect(dis, black, (start_x, start_y, 50, 15), 1)
 
 
-def ball_draw(ball):
+def ball_draw(dis, ball):
     """Ball drawing."""
     pygame.draw.circle(dis, ball_color, ball, 7)
     pygame.draw.circle(dis, black, ball, 7, 1)
 
 
-def paddle(x):
+def paddle(dis, x):
     """Paddle drawing."""
     pygame.draw.rect(dis, paddle_color, (x, 350, 100, 10))
     pygame.draw.rect(dis, black, (x, 350, 100, 10), 1)
@@ -64,9 +49,8 @@ def paddle_right(paddle_x):
     return 5
 
 
-def ball_move(ball, rectangl, fir):
+def ball_move(ball, rectangl, fir, paddle_x, game_close, result, move_ball):
     """Ball movement."""
-    global game_close, result
     if ball[0] - 3.5 <= 0:
         move_ball[0] = 2
     if ball[0] + 3.5 >= dis_width:
@@ -79,17 +63,16 @@ def ball_move(ball, rectangl, fir):
             result = True
     if ball[1] - 3.5 <= 0:
         move_ball[1] = 2
-    if hit_paddle(ball):
+    if hit_paddle(ball, paddle_x):
         move_ball[1] = -2
     for i in range(len(rectangl)):
         if hit_rect_wi(rectangl, i, ball, fir):
             move_ball[1] = 2
-    return move_ball
+    return move_ball, game_close, result
 
 
-def hit_paddle(ball):
+def hit_paddle(ball, paddle_x):
     """Ball and paddle collision handling."""
-    global paddle_x
     if ball[0] >= paddle_x - 3.5 and ball[0] <= paddle_x + 100 + 3.5 \
        and ball[1] >= 350 - 3.5 and ball[1] <= 360 - 3.5:
         return True
@@ -108,9 +91,9 @@ def hit_rect_wi(rectangl, i, ball, fir):
         return False
 
 
-def gameLoop():
+def gameLoop(dis, clock, font_style, score_font, paddle_x,
+             ball, move, game_close, result, move_ball):
     """Loop of game."""
-    global paddle_x, ball, move, game_close
     game_over = False
     paddle_speed = 0
 
@@ -147,9 +130,9 @@ def gameLoop():
         while game_close:
             dis.fill(ground)
             if result:
-                message("You win!", red)
+                message(dis, "You win!", red, font_style)
             else:
-                message("You lose!", red)
+                message(dis, "You lose!", red, font_style)
             pygame.display.update()
             time.sleep(3)
             game_over = True
@@ -176,16 +159,18 @@ def gameLoop():
             paddle_speed = 0
 
         dis.fill(ground)
-        paddle(paddle_x)
+        paddle(dis, paddle_x)
 
         for i, elem in enumerate(rectangl):
             if fir[i]:
-                rect(*elem)
+                rect(dis, *elem)
         if move:
-            move_ball = ball_move(ball, rectangl, fir)
+            move_ball, game_close, result = ball_move(ball, rectangl, fir,
+                                                      paddle_x, game_close,
+                                                      result, move_ball)
             ball[0] += move_ball[0]
             ball[1] += move_ball[1]
-        ball_draw(ball)
+        ball_draw(dis, ball)
 
         pygame.display.update()
         clock.tick(FPS)
@@ -195,7 +180,22 @@ def gameLoop():
 
 def main():
     """App starting function."""
-    gameLoop()
+    paddle_x = 250
+    ball = [150, 200]
+    move_ball = [-2, -2]
+    move = False
+    game_close = False
+    result = True
+    pygame.init()
+    pygame.key.set_repeat(10, 10)
+
+    dis = pygame.display.set_mode((dis_width, dis_height))
+    pygame.display.set_caption('Paddle Game')
+    clock = pygame.time.Clock()
+    font_style = pygame.font.SysFont("bahnschrift", 25)
+    score_font = pygame.font.SysFont("comicsansms", 35)
+    gameLoop(dis, clock, font_style, score_font, paddle_x,
+             ball, move, game_close, result, move_ball)
 
 
 if __name__ == '__main__':

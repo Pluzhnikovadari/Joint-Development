@@ -4,21 +4,9 @@ from threading import Thread
 from labirint import start_labirint
 from tetris import main_menu
 import tic
-
-
-def Snake():
-    """Start Snake game."""
-    import snake
-
-
-def Plat():
-    """Start Platform and ball game."""
-    import platform_and_ball
-
-
-def Meteor():
-    """Start Meteor game."""
-    import meteor
+import snake
+import platform_and_ball
+import meteor
 
 
 class Application(tk.Frame):
@@ -54,19 +42,19 @@ class Application(tk.Frame):
 
     def snakebut(self):
         """Snake button."""
-        thread1 = Thread(target=Snake)
+        thread1 = Thread(target=snake.main)
         thread1.start()
         thread1.join()
 
     def platformbut(self):
         """Platform and ball button."""
-        thread2 = Thread(target=Plat)
+        thread2 = Thread(target=platform_and_ball.main)
         thread2.start()
         thread2.join()
 
     def meteorbut(self):
         """Meteor button."""
-        thread2 = Thread(target=Meteor)
+        thread2 = Thread(target=meteor.main)
         thread2.start()
         thread2.join()
 

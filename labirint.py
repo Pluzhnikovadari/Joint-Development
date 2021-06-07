@@ -393,7 +393,7 @@ def lose_game(surface, time, treasure_cnt):
         form = "flowers"
     text2 = f.render("You managed to collect {} {}".format(treasure_cnt, form),
                      False, LOSE_TEXT_COLOR)
-    text3 = f.render("and survive for {:.2f} seconds".format(time),
+    text3 = f.render("and survived for {:.2f} seconds".format(time),
                      False, LOSE_TEXT_COLOR)
     text4 = f.render("Press Enter to restart", False,
                      LOSE_TEXT_COLOR)

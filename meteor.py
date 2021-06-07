@@ -5,7 +5,6 @@ import random
 import os
 import sys
 import datetime
-pygame.init()
 FPS = 60
 white = (255, 255, 255)
 black = (0, 0, 0)
@@ -15,62 +14,17 @@ green = (0, 255, 0)
 blue = (0, 0, 255)
 player_speed = 5
 yellow = (255, 204, 0)
-move = False
 dis_width = 1000
 dis_height = 600
-dis = pygame.display.set_mode((dis_width, dis_height))
-pygame.display.set_caption('Meteor Game')
-clock = pygame.time.Clock()
-font_style = pygame.font.SysFont("bahnschrift", 25)
-score_font = pygame.font.SysFont("comicsansms", 35)
-
-game_folder = os.path.dirname("../Joint-Development/meteor.py")
-img_folder = os.path.join(game_folder, 'images')
-player_img = pygame.image.load(os.path.join(img_folder,
-                               'ship.png')).convert_alpha()
-health_img = pygame.image.load(os.path.join(img_folder,
-                               'health.png')).convert_alpha()
-health_img_m = pygame.image.load(os.path.join(img_folder,
-                                 'health_m.png')).convert_alpha()
-asteriod_img = pygame.image.load(os.path.join(img_folder,
-                                 'asteroid.png')).convert_alpha()
-background = pygame.image.load(os.path.join(img_folder,
-                               'kos.jpg')).convert()
-background_rect = background.get_rect()
-
-explode = [pygame.image.load(os.path.join(img_folder,
-                             'ex0.png')).convert_alpha(),
-           pygame.image.load(os.path.join(img_folder,
-                             'ex1.png')).convert_alpha(),
-           pygame.image.load(os.path.join(img_folder,
-                             'ex2.png')).convert_alpha(),
-           pygame.image.load(os.path.join(img_folder,
-                             'ex3.png')).convert_alpha(),
-           pygame.image.load(os.path.join(img_folder,
-                             'ex4.png')).convert_alpha(),
-           pygame.image.load(os.path.join(img_folder,
-                             'ex5.png')).convert_alpha(),
-           pygame.image.load(os.path.join(img_folder,
-                             'ex6.png')).convert_alpha(),
-           pygame.image.load(os.path.join(img_folder,
-                             'ex7.png')).convert_alpha(),
-           pygame.image.load(os.path.join(img_folder,
-                             'ex8.png')).convert_alpha()]
-
-game_close = False
 bul_speed = -10
-score = 0
-inp = ''
-health = 4
 
 
-def input_name():
+def input_name(dis, font_style, game_close, move, health, inp):
     """Introdusing and options."""
     pygame.display.update()
     input_box = pygame.Rect(100, 100, 140, 32)
     color = pygame.Color('dodgerblue2')
     done = False
-    global inp
 
     while not done:
         for event in pygame.event.get():
@@ -98,18 +52,17 @@ def input_name():
         dis.blit(txt_surface, (input_box.x+5, input_box.y+5))
         pygame.draw.rect(dis, color, input_box, 2)
         pygame.display.flip()
+    return inp
 
 
-def draw_expl(x, y, i):
+def draw_expl(dis, x, y, i, explode):
     """Explosion drawing."""
-    global explode
     rect = explode[i].get_rect(center=(x, y))
     dis.blit(explode[i], rect)
 
 
-def pr_health(health):
+def pr_health(dis, health, health_img, health_img_m):
     """Health bar drawing."""
-    global health_img, health_img_m
     if health > 0:
         if health > 2:
             rect = health_img.get_rect(center=(980, 20))
@@ -132,29 +85,26 @@ def pr_health(health):
         dis.blit(health_img, rect)
 
 
-def pr_score():
+def pr_score(dis, score, score_font):
     """Score drawing."""
-    global score
     value = score_font.render("Your Score: " + str(score), True, white)
     dis.blit(value, [0, 0])
 
 
-def message(msg, color):
+def message(dis, font_style, msg, color):
     """System messages drawing."""
     mesg = font_style.render(msg, True, color)
     dis.blit(mesg, [dis_width / 6, dis_height / 3])
 
 
-def ship_draw(start_x, start_y):
+def ship_draw(dis, start_x, start_y, player_img):
     """Spaceship drawing."""
-    global player_img
     rect = player_img.get_rect(center=(start_x, start_y))
     dis.blit(player_img, rect)
 
 
-def asteroid_draw(start_x, start_y):
+def asteroid_draw(dis, start_x, start_y, asteriod_img):
     """Asteroids drawing."""
-    global asteriod_img
     rect = asteriod_img.get_rect(center=(start_x, start_y))
     dis.blit(asteriod_img, rect)
 
@@ -207,14 +157,13 @@ def hit_meteor(gamer, met, met_speed):
     return False
 
 
-def bullet_draw(x, y):
+def bullet_draw(dis, x, y):
     """Bullet drawing."""
     pygame.draw.circle(dis, yellow, (x, y), 3)
 
 
 def hit_bullet(bul, asteroids, e, exp):
     """Bullet and meteor collision handling."""
-    global score
     for ast in asteroids:
         if ast[0][0] + 25 > bul[0] - 3.5 and \
            ast[0][0] - 25 < bul[0] + 3.5 and \
@@ -226,14 +175,46 @@ def hit_bullet(bul, asteroids, e, exp):
             ast[0][1] = random.randrange(-100, -40)
             ast[1][1] = random.randrange(1, 8)
             ast[0][0] = random.randrange(-3, 3)
-            score += 1
             return True
     return False
 
 
-def gameLoop():
+def gameLoop(dis, font_style, clock, game_close, move, health, score, inp):
     """Loop of game."""
-    global game_close, move, health, paused
+    score_font = pygame.font.SysFont("comicsansms", 35)
+
+    game_folder = os.path.dirname("../Joint-Development/meteor.py")
+    img_folder = os.path.join(game_folder, 'images')
+    player_img = pygame.image.load(os.path.join(img_folder,
+                                   'ship.png')).convert_alpha()
+    health_img = pygame.image.load(os.path.join(img_folder,
+                                   'health.png')).convert_alpha()
+    health_img_m = pygame.image.load(os.path.join(img_folder,
+                                     'health_m.png')).convert_alpha()
+    asteriod_img = pygame.image.load(os.path.join(img_folder,
+                                     'asteroid.png')).convert_alpha()
+    background = pygame.image.load(os.path.join(img_folder,
+                                   'kos.jpg')).convert()
+    background_rect = background.get_rect()
+
+    explode = [pygame.image.load(os.path.join(img_folder,
+                                 'ex0.png')).convert_alpha(),
+               pygame.image.load(os.path.join(img_folder,
+                                 'ex1.png')).convert_alpha(),
+               pygame.image.load(os.path.join(img_folder,
+                                 'ex2.png')).convert_alpha(),
+               pygame.image.load(os.path.join(img_folder,
+                                 'ex3.png')).convert_alpha(),
+               pygame.image.load(os.path.join(img_folder,
+                                 'ex4.png')).convert_alpha(),
+               pygame.image.load(os.path.join(img_folder,
+                                 'ex5.png')).convert_alpha(),
+               pygame.image.load(os.path.join(img_folder,
+                                 'ex6.png')).convert_alpha(),
+               pygame.image.load(os.path.join(img_folder,
+                                 'ex7.png')).convert_alpha(),
+               pygame.image.load(os.path.join(img_folder,
+                                 'ex8.png')).convert_alpha()]
     game_over = False
     gamer = [250, 350]
     asteroids = []
@@ -248,7 +229,7 @@ def gameLoop():
     while not game_over:
         while game_close:
             dis.fill(ground)
-            message("Your score: " + str(score), red)
+            message(dis, font_style, "Your score: " + str(score), red)
 
             file = open('meteor.txt', 'r')
             data = file.readlines()
@@ -301,18 +282,22 @@ def gameLoop():
 
         for elem in asteroids:
             updete_met(*elem)
-            asteroid_draw(*elem[0])
+            asteroid_draw(dis, *elem[0], asteriod_img)
 
         bul_update = []
         for elem in bullet:
             elem[1] += bul_speed
-            if elem[1] > -20 and not hit_bullet(elem, asteroids, e, exp):
-                bul_update.append(elem)
+            if elem[1] > -20:
+                flag = hit_bullet(elem, asteroids, e, exp)
+                if flag:
+                    score += 1
+                else:
+                    bul_update.append(elem)
         bullet = bul_update[::]
         for elem in bullet:
-            bullet_draw(*elem)
+            bullet_draw(dis, *elem)
 
-        ship_draw(*gamer)
+        ship_draw(dis, *gamer, player_img)
 
         res = False
         for elem in asteroids:
@@ -325,15 +310,15 @@ def gameLoop():
                 if health <= 0:
                     game_close = True
 
-        pr_health(health)
-        pr_score()
+        pr_health(dis, health, health_img, health_img_m)
+        pr_score(dis, score, score_font)
 
         update_e = []
         update_exp = []
         for i, el in enumerate(e):
             if el < 9:
                 update_e.append(el + 1)
-                draw_expl(exp[i][0], exp[i][1], el)
+                draw_expl(dis, exp[i][0], exp[i][1], el, explode)
                 update_exp.append(exp[i])
         e = update_e[::]
         exp = update_exp[::]
@@ -347,9 +332,23 @@ def gameLoop():
 
 def main():
     """App starting function."""
-    input_name()
+    pygame.init()
+    font_style = pygame.font.SysFont("bahnschrift", 25)
+
+    move = False
+
+    dis = pygame.display.set_mode((dis_width, dis_height))
+    pygame.display.set_caption('Meteor Game')
+    clock = pygame.time.Clock()
+
+    game_close = False
+    score = 0
+    inp = ''
+    health = 4
+    inp = input_name(dis, font_style, game_close, move, health, inp)
     pygame.key.set_repeat(10, 10)
-    gameLoop()
+    gameLoop(dis, font_style, clock, game_close, move, health, score, inp)
+
 
 if __name__ == '__main__':
     main()

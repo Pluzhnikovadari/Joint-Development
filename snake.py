@@ -3,7 +3,6 @@ import pygame
 import time
 import random
 import sys
-pygame.init()
 sc = (0, 0, 0)
 snake = (102, 51, 0)
 red = (139, 0, 0)
@@ -12,23 +11,15 @@ ground = (154, 205, 50)
 food = [(139, 0, 0), (102, 0, 102), (0, 51, 51), (255, 204, 0)]
 dis_width = 600
 dis_height = 400
-dis = pygame.display.set_mode((dis_width, dis_height))
-pygame.display.set_caption('Snake Game')
-clock = pygame.time.Clock()
 snake_block = 10
 snake_speed = 15
-font_style = pygame.font.SysFont("bahnschrift", 25)
-score_font = pygame.font.SysFont("comicsansms", 35)
-inp = ''
-paused = False
 
 
-def input_name():
+def input_name(dis, font_style, inp):
     """Introdusing and options."""
     input_box = pygame.Rect(100, 100, 140, 32)
     color = pygame.Color('dodgerblue2')
     done = False
-    global inp
 
     while not done:
         for event in pygame.event.get():
@@ -56,29 +47,29 @@ def input_name():
         dis.blit(txt_surface, (input_box.x+5, input_box.y+5))
         pygame.draw.rect(dis, color, input_box, 2)
         pygame.display.flip()
+    return inp
 
 
-def Your_score(score):
+def Your_score(dis, score, score_font):
     """Visualization of score."""
     value = score_font.render("Your Score: " + str(score), True, sc)
     dis.blit(value, [0, 0])
 
 
-def our_snake(snake_block, snake_list):
+def our_snake(dis, snake_block, snake_list):
     """Drawing snake."""
     for x in snake_list:
         pygame.draw.rect(dis, snake, [x[0], x[1], snake_block, snake_block])
 
 
-def message(msg, color):
+def message(dis, msg, color, font_style):
     """Drawing system messages."""
     mesg = font_style.render(msg, True, color)
     dis.blit(mesg, [dis_width / 6, dis_height / 3])
 
 
-def gameLoop():
+def gameLoop(dis, clock, font_style, score_font, paused, inp):
     """Loop of game."""
-    global paused
     game_over = False
     game_close = False
 
@@ -99,7 +90,8 @@ def gameLoop():
 
         while game_close:
             dis.fill(ground)
-            message("Your score: " + str(Length_of_snake - 1), red)
+            message(dis, "Your score: " + str(Length_of_snake - 1),
+                    red, font_style)
 
             file = open('score_snake.txt', 'r')
             data = file.readlines()
@@ -123,6 +115,7 @@ def gameLoop():
 
             time.sleep(3)
 
+            file.close()
             file = open('score_snake.txt', 'w')
             text = ""
             for el in table:
@@ -176,8 +169,8 @@ def gameLoop():
                 if x == snake_Head:
                     game_close = True
 
-            our_snake(snake_block, snake_List)
-            Your_score(Length_of_snake - 1)
+            our_snake(dis, snake_block, snake_List)
+            Your_score(dis, Length_of_snake - 1, score_font)
 
             pygame.display.update()
 
@@ -197,8 +190,17 @@ def gameLoop():
 
 def main():
     """App starting function."""
-    input_name()
-    gameLoop()
+    inp = ''
+    paused = False
+    pygame.init()
+    font_style = pygame.font.SysFont("bahnschrift", 25)
+    score_font = pygame.font.SysFont("comicsansms", 35)
+
+    dis = pygame.display.set_mode((dis_width, dis_height))
+    pygame.display.set_caption('Snake Game')
+    clock = pygame.time.Clock()
+    inp = input_name(dis, font_style, inp)
+    gameLoop(dis, clock, font_style, score_font, paused, inp)
 
 
 if __name__ == '__main__':
