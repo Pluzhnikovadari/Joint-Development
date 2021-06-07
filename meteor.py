@@ -123,6 +123,7 @@ def update(gamer):
         gamer_speed[1] = 8
     gamer[0] += gamer_speed[0]
     gamer[1] += gamer_speed[1]
+    pygame.event.pump()
 
 
 def create_met():
@@ -345,8 +346,9 @@ def main():
     score = 0
     inp = ''
     health = 4
+    pygame.key.set_repeat(1000, 10000)
     inp = input_name(dis, font_style, game_close, move, health, inp)
-    pygame.key.set_repeat(10, 10)
+    pygame.key.set_repeat(1, 10)
     gameLoop(dis, font_style, clock, game_close, move, health, score, inp)
 
 
