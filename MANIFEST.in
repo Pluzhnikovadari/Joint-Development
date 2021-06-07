@@ -1,4 +1,5 @@
+recursive-include sourse *.po
+recursive-include Games/images *
+recursive-include Games *
 include *.png
 include *.txt
-recursive-include Games/images *.png
-recursive-include images *.png

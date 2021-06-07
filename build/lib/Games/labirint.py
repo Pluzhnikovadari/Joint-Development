@@ -181,8 +181,11 @@ class Treasure:
         self.flag = True
 
         dirname = os.path.dirname(__file__)
+        srcdir = '../Games'
+        sys.path.insert(0, os.path.abspath(os.path.join(dirname, srcdir)))
         filename = os.path.join(dirname, 'images/flower.png')
         self.surf = pygame.image.load(filename).convert()
+        sys.path.remove(os.path.abspath(os.path.join(dirname, srcdir)))
         self.surf.set_colorkey((255, 255, 255))
         self.type = "treasure"
         resize = (self.surf.get_width() // 30, self.surf.get_height() // 30)
@@ -205,8 +208,10 @@ class Player:
 
         dirname = os.path.dirname(__file__)
         srcdir = '../Games/images/bug.png'
+        #sys.path.insert(0, os.path.abspath(os.path.join(dirname, srcdir)))
         filename = os.path.join(dirname, srcdir)
         self.surf = pygame.image.load(filename).convert()
+        #sys.path.remove(os.path.abspath(os.path.join(dirname, srcdir)))
         self.surf.set_colorkey((255, 255, 255))
         self.degree = 0
         self.type = "player"
@@ -362,8 +367,7 @@ def game_start(surface):
                     START_TEXT_COLOR)
     text2 = f.render(_("Your mission is to collect all the flowers"), False,
                      START_TEXT_COLOR)
-    text3 = f.render(_("on the field until the balls catch up with you"),
-                     False,
+    text3 = f.render(_("on the field until the balls catch up with you"), False,
                      START_TEXT_COLOR)
     text4 = f.render(_("Key control:"), False,
                      START_TEXT_COLOR)
@@ -399,8 +403,7 @@ def lose_game(surface, time, treasure_cnt):
         form = "flower"
     else:
         form = "flowers"
-    text2 = f.render(_("You managed to collect {} {}").format(treasure_cnt,
-                                                              form),
+    text2 = f.render(_("You managed to collect {} {}").format(treasure_cnt, form),
                      False, LOSE_TEXT_COLOR)
     text3 = f.render(_("and survived for {:.2f} seconds").format(time),
                      False, LOSE_TEXT_COLOR)
@@ -425,8 +428,8 @@ def win_game(surface, time):
 
     f = pygame.font.SysFont('arial', 48)
     text = f.render(_("You win!"), False, WIN_TEXT_COLOR)
-    text2 = f.render(_("You managed to collect all flowers ")
-                     + _("for {:.2f} seconds").format(time),
+    text2 = f.render(_("You managed to collect all flowers ") +
+                     _("for {:.2f} seconds").format(time),
                      False, WIN_TEXT_COLOR)
     text3 = f.render(_("Press Enter to restart"), False,
                      WIN_TEXT_COLOR)
