@@ -42,9 +42,9 @@ def input_name(dis, font_style, inp):
                                  True, black)
         dis.blit(mesg, [100, 40])
         txt_surface = font_style.render(inp, True, color)
-        width = max(200, txt_surface.get_width()+10)
+        width = max(200, txt_surface.get_width() + 10)
         input_box.w = width
-        dis.blit(txt_surface, (input_box.x+5, input_box.y+5))
+        dis.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
         pygame.draw.rect(dis, color, input_box, 2)
         pygame.display.flip()
     return inp
@@ -108,8 +108,8 @@ def gameLoop(dis, clock, font_style, score_font, paused, inp):
             mesg = font_style.render("Best results:", True, black)
             dis.blit(mesg, [dis_width / 6, dis_height / 3 + 20])
             for i, elem in enumerate(table):
-                mesg = font_style.render(elem[1] + " "
-                                         + str(elem[0]), True, black)
+                mesg = font_style.render(elem[1] + " " + str(elem[0]),
+                                         True, black)
                 dis.blit(mesg, [dis_width / 6, dis_height / 3 + (i + 2) * 20])
             pygame.display.update()
 
@@ -176,10 +176,10 @@ def gameLoop(dis, clock, font_style, score_font, paused, inp):
 
             if x1 == foodx and y1 == foody:
                 col = random.choice(food)
-                foodx = round(random.randrange(0, dis_width
-                              - snake_block) / 10.0) * 10.0
-                foody = round(random.randrange(0, dis_height
-                              - snake_block) / 10.0) * 10.0
+                foodx = round(random.randrange(
+                    0, dis_width - snake_block) / 10.0) * 10.0
+                foody = round(random.randrange(
+                    0, dis_height - snake_block) / 10.0) * 10.0
                 Length_of_snake += 1
 
         clock.tick(snake_speed)

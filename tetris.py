@@ -206,11 +206,11 @@ def start():
                     if not valid_space(current_piece, grid):
                         current_piece.x -= 1
                 elif event.key == pygame.K_UP:
-                    current_piece.rotation = current_piece.rotation + 1 % \
-                                             len(current_piece.shape)
+                    current_piece.rotation = (current_piece.rotation
+                                              + 1 % len(current_piece.shape))
                     if not valid_space(current_piece, grid):
-                        current_piece.rotation = current_piece.rotation - 1 % \
-                                                 len(current_piece.shape)
+                        current_piece.rotation = (current_piece.rotation - 1
+                                                  % len(current_piece.shape))
                 if event.key == pygame.K_DOWN:
                     current_piece.y += 1
                     if not valid_space(current_piece, grid):
