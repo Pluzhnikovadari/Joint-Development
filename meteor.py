@@ -109,21 +109,18 @@ def asteroid_draw(dis, start_x, start_y, asteriod_img):
     dis.blit(asteriod_img, rect)
 
 
-def update(gamer):
+def update(gamer, key):
     """Spaceship movement."""
     gamer_speed = [0, 0]
-    keystate = pygame.key.get_pressed()
-    if keystate[pygame.K_LEFT] and gamer[0] - 35 > 0:
+    if key == pygame.K_LEFT and gamer[0] - 35 > 0:
         gamer_speed[0] = -8
-    if keystate[pygame.K_RIGHT] and gamer[0] + 35 < dis_width:
+    if key == pygame.K_RIGHT and gamer[0] + 35 < dis_width:
         gamer_speed[0] = 8
-    if keystate[pygame.K_UP] and gamer[1] - 35 > 0:
+    if key == pygame.K_UP and gamer[1] - 35 > 0:
         gamer_speed[1] = -8
-    if keystate[pygame.K_DOWN] and gamer[1] + 35 < dis_height:
+    if key == pygame.K_DOWN and gamer[1] + 35 < dis_height:
         gamer_speed[1] = 8
-    gamer[0] += gamer_speed[0]
-    gamer[1] += gamer_speed[1]
-    pygame.event.pump()
+    return gamer_speed
 
 
 def create_met():
@@ -226,6 +223,7 @@ def gameLoop(dis, font_style, clock, game_close, move, health, score, inp):
     now_time = datetime.datetime.now()
     e = []
     exp = []
+    gamer_speed = [0, 0]
 
     while not game_over:
         while game_close:
@@ -269,17 +267,29 @@ def gameLoop(dis, font_style, clock, game_close, move, health, score, inp):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
-                cur_time = datetime.datetime.now()
-                difference = cur_time - now_time
-                if divmod(difference.seconds * 60 +
-                          difference.microseconds, 60)[1] > 50:
-                    bullet.append([gamer[0], gamer[1]])
-                    now_time = cur_time
-            update(gamer)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_s:
+                    cur_time = datetime.datetime.now()
+                    difference = cur_time - now_time
+                    if divmod(difference.seconds * 60 +
+                              difference.microseconds, 60)[1] > 50:
+                        bullet.append([gamer[0], gamer[1]])
+                        now_time = cur_time
+                gamer_speed = update(gamer, event.key)
 
         dis.fill(ground)
         dis.blit(background, background_rect)
+
+        if gamer[0] - 35 < 0 and gamer_speed[0] == -8:
+            gamer_speed[0] = 0
+        elif gamer[0] + 35 > dis_width and gamer_speed[0] == 8:
+            gamer_speed[0] = 0
+        if gamer[1] - 35 < 0 and gamer_speed[1] == -8:
+            gamer_speed[1] = 0
+        elif gamer[1] + 35 > dis_height and gamer_speed[1] == 8:
+            gamer_speed[1] = 0
+        gamer[0] += gamer_speed[0]
+        gamer[1] += gamer_speed[1]
 
         for elem in asteroids:
             updete_met(*elem)
