@@ -43,13 +43,13 @@ def input_name(dis, font_style, game_close, move, health, inp):
         dis.fill(ground)
         mesg = font_style.render("Input your name", True, white)
         dis.blit(mesg, [100, 80])
-        mesg = font_style.render(
-            "For shootig use 'S' key, " + "for moving use arrows", True, white)
+        mesg = font_style.render("For shootig use 'S' key, " +
+                                 "for moving use arrows", True, white)
         dis.blit(mesg, [100, 40])
         txt_surface = font_style.render(inp, True, color)
-        width = max(200, txt_surface.get_width() + 10)
+        width = max(200, txt_surface.get_width()+10)
         input_box.w = width
-        dis.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
+        dis.blit(txt_surface, (input_box.x+5, input_box.y+5))
         pygame.draw.rect(dis, color, input_box, 2)
         pygame.display.flip()
     return inp
@@ -181,7 +181,7 @@ def gameLoop(dis, font_style, clock, game_close, move, health, score, inp):
     """Loop of game."""
     score_font = pygame.font.SysFont("comicsansms", 35)
 
-    game_folder = os.path.dirname("../Joint-Development/meteor.py")
+    game_folder = os.path.dirname("../Games/meteor.py")
     img_folder = os.path.join(game_folder, 'images')
     player_img = pygame.image.load(os.path.join(img_folder,
                                    'ship.png')).convert_alpha()
@@ -245,8 +245,8 @@ def gameLoop(dis, font_style, clock, game_close, move, health, score, inp):
             mesg = font_style.render("Best results:", True, white)
             dis.blit(mesg, [dis_width / 6, dis_height / 3 + 40])
             for i, elem in enumerate(table):
-                mesg = font_style.render(
-                    elem[1] + " " + str(elem[0]), True, white)
+                mesg = font_style.render(elem[1] + " " +
+                                         str(elem[0]), True, white)
                 dis.blit(mesg, [dis_width / 6,
                          dis_height / 3 + (i + 3) * 20])
             pygame.display.update()
@@ -271,8 +271,8 @@ def gameLoop(dis, font_style, clock, game_close, move, health, score, inp):
                 if event.key == pygame.K_s:
                     cur_time = datetime.datetime.now()
                     difference = cur_time - now_time
-                    if divmod(difference.seconds * 60
-                              + difference.microseconds, 60)[1] > 50:
+                    if divmod(difference.seconds * 60 +
+                              difference.microseconds, 60)[1] > 50:
                         bullet.append([gamer[0], gamer[1]])
                         now_time = cur_time
                 gamer_speed = update(gamer, event.key)

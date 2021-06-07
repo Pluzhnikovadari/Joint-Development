@@ -1,0 +1,4 @@
+include *.png
+include *.txt
+recursive-include Games/images *.png
+recursive-include images *.png
