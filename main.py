@@ -9,7 +9,7 @@ import platform_and_ball
 import meteor
 import gettext
 
-gettext.install("messages", ".", names = ("ngettext",))
+gettext.install("messages", ".", names=("ngettext",))
 
 
 class Application(tk.Frame):
@@ -23,7 +23,8 @@ class Application(tk.Frame):
 
     def createWidgets(self):
         """Create buttons."""
-        self.SnakeButton = tk.Button(self, text=_('Snake'), command=self.snakebut)
+        self.SnakeButton = tk.Button(self, text=_('Snake'),
+                                     command=self.snakebut)
         self.PlatformButton = tk.Button(self, text=_('Platform and ball'),
                                         command=self.platformbut)
         self.MeteorButton = tk.Button(self, text=_('Meteor'),

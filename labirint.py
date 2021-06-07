@@ -354,7 +354,8 @@ def game_start(surface):
                     START_TEXT_COLOR)
     text2 = f.render(_("Your mission is to collect all the flowers"), False,
                      START_TEXT_COLOR)
-    text3 = f.render(_("on the field until the balls catch up with you"), False,
+    text3 = f.render(_("on the field until the balls catch up with you"),
+                     False,
                      START_TEXT_COLOR)
     text4 = f.render(_("Key control:"), False,
                      START_TEXT_COLOR)
@@ -390,7 +391,8 @@ def lose_game(surface, time, treasure_cnt):
         form = "flower"
     else:
         form = "flowers"
-    text2 = f.render(_("You managed to collect {} {}").format(treasure_cnt, form),
+    text2 = f.render(_("You managed to collect {} {}").format(treasure_cnt,
+                                                              form),
                      False, LOSE_TEXT_COLOR)
     text3 = f.render(_("and survived for {:.2f} seconds").format(time),
                      False, LOSE_TEXT_COLOR)
