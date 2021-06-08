@@ -1,15 +1,21 @@
 """Main window."""
 import tkinter as tk
 from threading import Thread
+import os
+import sys
+testdir = os.path.dirname(__file__)
+srcdir = '../Games'
+sys.path.insert(0, os.path.abspath(os.path.join(testdir, srcdir)))
 from labirint import start_labirint
 from tetris import main_menu
 import tic
 import snake
 import platform_and_ball
 import meteor
+sys.path.remove(os.path.abspath(os.path.join(testdir, srcdir)))
 import gettext
 
-gettext.install("messages", ".", names=("ngettext",))
+gettext.install("messages", os.path.dirname(__file__), names=("ngettext",))
 
 
 class Application(tk.Frame):

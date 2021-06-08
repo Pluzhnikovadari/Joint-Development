@@ -2,6 +2,7 @@
 from random import randint, random
 import pygame
 import sys
+import os
 import time
 
 WIN_WIDTH = 1500
@@ -178,7 +179,10 @@ class Treasure:
         self.sc = parent_surf
         self.number = number
         self.flag = True
-        self.surf = pygame.image.load('images/flower.png').convert()
+
+        dirname = os.path.dirname(__file__)
+        filename = os.path.join(dirname, 'images/flower.png')
+        self.surf = pygame.image.load(filename).convert()
         self.surf.set_colorkey((255, 255, 255))
         self.type = "treasure"
         resize = (self.surf.get_width() // 30, self.surf.get_height() // 30)
@@ -198,7 +202,11 @@ class Player:
     def __init__(self, parent_surf, pos, speed):
         """Init player."""
         self.sc = parent_surf
-        self.surf = pygame.image.load('images/bug.png').convert()
+
+        dirname = os.path.dirname(__file__)
+        srcdir = '../Games/images/bug.png'
+        filename = os.path.join(dirname, srcdir)
+        self.surf = pygame.image.load(filename).convert()
         self.surf.set_colorkey((255, 255, 255))
         self.degree = 0
         self.type = "player"

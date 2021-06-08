@@ -3,6 +3,7 @@ import pygame
 import time
 import random
 import sys
+import os
 sc = (0, 0, 0)
 snake = (102, 51, 0)
 red = (139, 0, 0)
@@ -93,7 +94,8 @@ def gameLoop(dis, clock, font_style, score_font, paused, inp):
             message(dis, "Your score: " + str(Length_of_snake - 1),
                     red, font_style)
 
-            file = open('score_snake.txt', 'r')
+            dirname = os.path.dirname(__file__)
+            file = open(os.path.join(dirname, 'score_snake.txt'), 'r')
             data = file.readlines()
             table = []
             for el in data:
@@ -116,7 +118,8 @@ def gameLoop(dis, clock, font_style, score_font, paused, inp):
             time.sleep(3)
 
             file.close()
-            file = open('score_snake.txt', 'w')
+            dirname = os.path.dirname(__file__)
+            file = open(os.path.join(dirname, 'score_snake.txt'), 'w')
             text = ""
             for el in table:
                 text += el[1] + " " + str(el[0]) + "\n"

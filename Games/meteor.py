@@ -181,8 +181,8 @@ def gameLoop(dis, font_style, clock, game_close, move, health, score, inp):
     """Loop of game."""
     score_font = pygame.font.SysFont("comicsansms", 35)
 
-    game_folder = os.path.dirname("../Joint-Development/meteor.py")
-    img_folder = os.path.join(game_folder, 'images')
+    dirname = os.path.dirname(__file__)
+    img_folder = os.path.join(dirname, 'images')
     player_img = pygame.image.load(os.path.join(img_folder,
                                    'ship.png')).convert_alpha()
     health_img = pygame.image.load(os.path.join(img_folder,
@@ -194,7 +194,6 @@ def gameLoop(dis, font_style, clock, game_close, move, health, score, inp):
     background = pygame.image.load(os.path.join(img_folder,
                                    'kos.jpg')).convert()
     background_rect = background.get_rect()
-
     explode = [pygame.image.load(os.path.join(img_folder,
                                  'ex0.png')).convert_alpha(),
                pygame.image.load(os.path.join(img_folder,
@@ -230,7 +229,8 @@ def gameLoop(dis, font_style, clock, game_close, move, health, score, inp):
             dis.fill(ground)
             message(dis, font_style, "Your score: " + str(score), red)
 
-            file = open('meteor.txt', 'r')
+            dirname = os.path.dirname(__file__)
+            file = open(os.path.join(dirname, 'meteor.txt'), 'r')
             data = file.readlines()
             table = []
             for el in data:
@@ -252,8 +252,9 @@ def gameLoop(dis, font_style, clock, game_close, move, health, score, inp):
             pygame.display.update()
 
             time.sleep(3)
-
-            file = open('meteor.txt', 'w')
+            file.close()
+            dirname = os.path.dirname(__file__)
+            file = open(os.path.join(dirname, 'meteor.txt'), 'w')
             text = ""
             for el in table:
                 text += el[1] + " " + str(el[0]) + "\n"
