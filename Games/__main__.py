@@ -15,7 +15,7 @@ import meteor
 sys.path.remove(os.path.abspath(os.path.join(testdir, srcdir)))
 import gettext
 
-gettext.install("messages", ".", names=("ngettext",))
+gettext.install("messages", os.path.dirname(__file__), names=("ngettext",))
 
 
 class Application(tk.Frame):

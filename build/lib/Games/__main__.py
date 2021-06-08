@@ -15,7 +15,7 @@ import meteor
 sys.path.remove(os.path.abspath(os.path.join(testdir, srcdir)))
 import gettext
 
-gettext.install("messages", ".", names = ("ngettext",))
+gettext.install("messages", os.path.dirname(__file__), names=("ngettext",))
 
 
 class Application(tk.Frame):
@@ -29,7 +29,8 @@ class Application(tk.Frame):
 
     def createWidgets(self):
         """Create buttons."""
-        self.SnakeButton = tk.Button(self, text=_('Snake'), command=self.snakebut)
+        self.SnakeButton = tk.Button(self, text=_('Snake'),
+                                     command=self.snakebut)
         self.PlatformButton = tk.Button(self, text=_('Platform and ball'),
                                         command=self.platformbut)
         self.MeteorButton = tk.Button(self, text=_('Meteor'),
